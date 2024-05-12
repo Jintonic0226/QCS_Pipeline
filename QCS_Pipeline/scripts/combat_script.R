@@ -1,9 +1,11 @@
 # Combat #
 ## Combat ##
+# Install and load devtools package if you haven't already
+install.packages("devtools")
+library(devtools)
 
-# install packages for combat
-install.packages("sva", repos = "https://cran.rstudio.com/")
-
+# Install sva package from GitHub
+install_github("jtleek/sva")
 
 # running combat
 library (sva)
@@ -21,12 +23,13 @@ batch_data <- as.data.frame(t(combined_batch_info_data[,-(1)]))
 batch_info_values <- as.vector(unlist(batch_data["batch", , drop = FALSE]))
 batch_info_interday <- as.numeric(batch_info_values)
 #print(length(batch_info_interday))
-
+cat("Running Combat\n")
 # running combat
 combat_result_interday_app <- ComBat(dat = peak_data_matrix, batch = batch_info_interday)
-print(combat_result_interday_app)
 
 # save dataset as csv file
 write.csv(combat_result_interday_app,
-          file = "dataset/app_combat_interday_corrected_data.csv",
+          file = "dataset_app/app_combat_interday_corrected_data.csv",
           row.names = TRUE)
+
+cat("Successfully saved corrected dataset in dataset_app\n")
