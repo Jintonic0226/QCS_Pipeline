@@ -9,9 +9,13 @@
 <p>To run this notebook, it is recommended to run via anaconda with r-environment or through vs code with r-environment.</p>
 
 <b>Step 1: Go to Anaconda Navigator </b>
+
 <b>Step 2: Go to Environment </b>
+
 <b>Step 3: Click Create (plus sign) and create R-environment (choose R and give a name) </b>
+
 <b>Step 4: Either run notebook in VS Code or Anaconda (JupyterLab) </b>
+
 <b>Step 5: If you choose VS Code, you need to choose kernel at the top right and choose Jupyter kernel (or R-env directly) </b>
 
 Guide Images
