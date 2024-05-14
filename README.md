@@ -8,11 +8,11 @@
 <p>You can click to blue linked text to directly go to the section </p>
 <p>To run this notebook, it is recommended to run via anaconda with r-environment or through vs code with r-environment.</p>
 
-<h3 style="font-weight: bold; font-size: smaller;">Step 1: Go to Anaconda Navigator</h3>
-<h3 style="font-weight: bold; font-size: smaller;">Step 2: Go to Environment</h3>
-<h3 style="font-weight: bold; font-size: smaller;">Step 3: Click Create (plus sign) and create R-environment (choose R and give a name)</h3>
-<h3 style="font-weight: bold; font-size: smaller;">Step 4: Either run notebook in VS Code or Anaconda (JupyterLab)</h3>
-<h3 style="font-weight: bold; font-size: smaller;">Step 5: If you choose VS Code, you need to choose kernel at the top right and choose Jupyter kernel (or R-env directly)</h3>
+<b>Step 1: Go to Anaconda Navigator</b>
+<b>Step 2: Go to Environment</b>
+<b>Step 3: Click Create (plus sign) and create R-environment (choose R and give a name)</b>
+<b>Step 4: Either run notebook in VS Code or Anaconda (JupyterLab)</b>
+<b>Step 5: If you choose VS Code, you need to choose kernel at the top right and choose Jupyter kernel (or R-env directly)</b>
 
 Guide Images
 ![IMG_2264](https://github.com/Jintonic0226/QCS_Pipeline/assets/160440173/69091330-6f32-4a01-b330-09941a0dadfe)
