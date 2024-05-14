@@ -13,3 +13,6 @@
 <h3 style="font-weight: bold; font-size: smaller;">Step 3: Click Create (plus sign) and create R-environment (choose R and give a name)</h3>
 <h3 style="font-weight: bold; font-size: smaller;">Step 4: Either run notebook in VS Code or Anaconda (JupyterLab)</h3>
 <h3 style="font-weight: bold; font-size: smaller;">Step 5: If you choose VS Code, you need to choose kernel at the top right and choose Jupyter kernel (or R-env directly)</h3>
+
+Guide Images
+![IMG_2264](https://github.com/Jintonic0226/QCS_Pipeline/assets/160440173/69091330-6f32-4a01-b330-09941a0dadfe)
