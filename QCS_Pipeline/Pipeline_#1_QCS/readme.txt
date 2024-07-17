@@ -1,3 +1,4 @@
+How to set up for Pipeline #1
 Visual Studio Code Setup:
 - Install R version 4.33 from https://www.r-project.org/
 - Install R package ‘IRkernel’
