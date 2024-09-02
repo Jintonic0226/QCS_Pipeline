@@ -6,6 +6,8 @@
 <p>* <b>Pipeline #1</b> is used to evaluate intra and interday batch effect occuring in the QCS samples and corrects the batch effect using Internal Standard Normalization.</p>
 
 <p>* <b>Pipeline #2</b> is used to evaluate the intra and interday batch effect occuring in the QCS samples and artifically made tissue homogenate samples and allows user to correct the occuring batch effect amonst multiple correction methods such as Combat, WaveICA, NormAE.</p> 
+
+<p> To evaluate batch effect, we used relative standard deviation (RSD) to be the measure of the variation occuring in samples.  </p>
   
 The pipeline #1 is used to evaluate the intra/interday batch effect in the QCS samples using relative standard deviation (RSD). The pipeline #2 is used to evaluate intra/interday batch effect in the QCS samples and also tissue homogenate samples. After evaluation, user can also choose to correct the occuring batch effect amongest multiple correction methods such as: Combat, WaveICA, NormAE, Total Ion Count normalization, and Internal Standard normalization.<p>
 
