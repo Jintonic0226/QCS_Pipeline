@@ -1,4 +1,4 @@
-<h2>Read Me</h2>
+<h2>Quality Control Standard Pipeline</h2>
 <p>The Quality Control Standard (QCS) pipeline was developed to help MALDI-MSI users evaluate and correct batch effects in their experiments. This pipeline employs a specialized Quality Control Standard, created by the Berta-Cillero group at the MERLN Institute in Maastricht, to monitor and control technical variations By integrating this standard, the pipeline ensures consistency across experiments, providing a reliable method for addressing technical variation in MALDI-MSI data.</p>
 
 <p>The pipeline consists of two notebooks: Pipeline #1 and Pipeline #2.</p>
