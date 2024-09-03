@@ -6,7 +6,7 @@ Visual Studio Code Setup:
 - Install python library ‘jupyter'’
 - Install Visual Studio code (VS code) from https://code.visualstudio.com/
 - Setup VS to work with R. Follow instructions from https://code.visualstudio.com/docs/languages/r
-- Open file ‘QCS_Pipeline.ipynb’ in VScode
+- Open file ‘Pipeline #1.ipynb’ in VScode
 - Select kernel -> Jupyter kernel -> R (from the computer)
 - Run ‘Pipeline #1.ipynb’
 
@@ -16,11 +16,11 @@ Anaconda Setup:
 - Setup an R environment. Follow instructions from https://docs.anaconda.com/free/working-with-conda/packages/using-r-language/# 
 - Activate the created R environment
 - Install R package ‘IRkernel’
-- Open jupyterlab through anaconda navigator or anaconda prompt
-- Open file ‘Pipeline #1.ipynb.ipynb’ to run
+- Open Jupyterlab through anaconda navigator or anaconda prompt
+- Open file ‘Pipeline #1.ipynb’ to run
 
 How to use Pipeline #1:
-- Upload 3 csv files into input folder
+- Upload 3 csv files into input folder: no normalization dataset, TIC (Total Ion Count) normalization dataset, batch information 
 - Give file path for the 3 csv files, QCS m/z values, tissue type names (sample_set) in input information cell
 - Run everything in order by either clicking the run button or pressing shift + enter 
   1) Preprocessing datasets (no normalization, TIC normalization, IS normalization)    2) RSD calculation

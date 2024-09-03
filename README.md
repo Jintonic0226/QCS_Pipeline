@@ -1,5 +1,15 @@
-<h2>Read Me</h2>
-<p>Quality Control Standards pipeline was developed to faciliate the data analysis of Quality Control Standards in MALDI-MSI workflow developed by Berta-Cillero group in MERLN Maastricht. There are two pipelines. The pipeline #1 is used to evaluate the intra/interday batch effect in the QCS samples using relative standard deviation (RSD). The pipeline #2 is used to evaluate intra/interday batch effect in the QCS samples and also tissue homogenate samples. After evaluation, user can also choose to correct the occuring batch effect amongest multiple correction methods such as: Combat, WaveICA, NormAE, Total Ion Count normalization, and Internal Standard normalization.<p>
+<h2>Quality Control Standard Pipeline</h2>
+<p>The Quality Control Standard (QCS) pipeline was developed to help MALDI-MSI users evaluate and correct batch effects in their experiments. This pipeline employs a specialized Quality Control Standard, created by the Berta-Cillero group at the MERLN Institute in Maastricht, to monitor and control technical variations By integrating this standard, the pipeline ensures consistency across experiments, providing a reliable method for addressing technical variation in MALDI-MSI data.</p>
+
+<p>The pipeline consists of two notebooks: Pipeline #1 and Pipeline #2.</p>
+![pipeline1 drawio](https://github.com/user-attachments/assets/b7b0937c-6580-4200-8117-60871491b306)
+![pipeline drawio](https://github.com/user-attachments/assets/3799856e-a893-4f42-8722-4b4e949a49e2)
+<p>* <b>Pipeline #1</b> is designed to evaluate and correct intra- and interday batch effects occurring in the QCS samples using Internal Standard Normalization. To evaluate batch effects, we used relative standard deviation (RSD) to measure of the variation occurring in the samples.</p>
+
+<p>* <b>Pipeline #2</b> is used to assess intra- and interday batch effects in both QCS samples and artificially created tissue homogenate samples. It allows users to correct batch effects using various methods such as Combat, WaveICA, and NormAE, Total Ion Count normalization, and Internal Standard normalization. To evaluate batch effects, we used relative standard deviation (RSD) to measure the variation occurring in the samples. As well, we perform Principal Component Analysis and assess their clusterness to evaluate the similarity of samples.</p> 
+
+<p> The batch correction methods used such as Combat, WaveICA, NormAE, Total Ion Count normalization, and Internal Standard normalizations are currently used batch correction methods in metabolomics, transcriptomics, and genomics data analysis. <p>
+  
 <p>Each pipeline consist of its own read me to follow through.<p>
 <p>Requirements: Visual Code Studio or Anaconda.<p> 
 

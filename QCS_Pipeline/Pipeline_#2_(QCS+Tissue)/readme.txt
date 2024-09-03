@@ -19,14 +19,15 @@ Anaconda Setup:
 6) Open file ‘Pipeline #2.ipynb’ to run
 
 How to use Pipeline #2:
-1) Upload 3 csv files into input folder
- *** For inputs, user input for file path for the 3 csv files, QCS m/z values, tissue type names (sample_set) are needed ***
-2) Run everything in order by either clicking the run button or pressing shift + enter 
-   - QCS Evaluation
-   - Tissue Evaluation
-   - Correction
-    *** For NormAE correction, user input for file path of Rec_nobe and Ys files are required ***
-   - Comparison
-   - Output (csv files of each dataset, excel sheets with intra/inter-batch, png results pdf)
-    *** For excel sheet, user input for number of batches existing in dataset is required ***
-3) If you were to change the input dataset, you would still need to run the whole cells to see the changes. 
+- Upload 3 csv files into input folder: no normalization dataset, TIC (Total Ion Count) normalization dataset, batch information
+- Give file path for the 3 csv files, QCS m/z values, tissue type names (sample_set) in input information cell
+- Run everything in order by either clicking the run button or pressing shift + enter
+   1) QCS batch effect evaluation
+   2) Tissue + QCS batch effect evaluation
+   3) Batch effect correction (Combat, WaveICA, and NormAE)
+      *** Notice *** For NormAE correction cell, you would need to run NormAE externally and upload Ys and Rec_nobe fies obtained after running NormAE 
+   4) Comparison
+   5) Outputs (csv files of each dataset, excel sheets with intra/inter-batch, overview result pdf)
+      *** Notice *** For excel sheet generation, user needs to give number of batches existing in dataset
+
+- If you were to change the input dataset, you would still need to run the whole cells to see the changes. 
