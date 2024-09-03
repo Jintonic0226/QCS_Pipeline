@@ -20,7 +20,7 @@ Anaconda Setup:
 - Open file ‘Pipeline #1.ipynb’ to run
 
 How to use Pipeline #1:
-- Upload 3 csv files into input folder: no normalization dataset, TIC normalization dataset, batch information 
+- Upload 3 csv files into input folder: no normalization dataset, TIC (Total Ion Count) normalization dataset, batch information 
 - Give file path for the 3 csv files, QCS m/z values, tissue type names (sample_set) in input information cell
 - Run everything in order by either clicking the run button or pressing shift + enter 
   1) Preprocessing datasets (no normalization, TIC normalization, IS normalization)    2) RSD calculation
