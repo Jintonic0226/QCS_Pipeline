@@ -7,9 +7,17 @@
 
 ![tutorial]()
 
-<img src="images/pipeline1.drawio.png" alt="pipeline1 drawio" height="400" width="400"/>
+<table align="center">
+  <tr>
+    <td style="padding-right: 100px;">
+      <img src="images/pipeline1.drawio.png" alt="pipeline1 drawio" height="400" width="400"/>
+    </td>
+    <td>
+      <img src="images/pipeline.drawio.png" alt="pipeline drawio" height="400" width="400"/>
+    </td>
+  </tr>
+</table>
 
-<img src="images/pipeline.drawio.png" alt="pipeline1 drawio" height="400" width="400"/>
 
 <p>Tutorial is designed to help users  </p>
 
@@ -19,10 +27,12 @@
 
 <p> As proposed in the diagram, the input used for this pipeline are no normalization dataset, TIC normalization dataset, and batch information. The no normalization dataset means a CSV file obtained from SCiLs lab software </p>
 
-<p> The batch correction methods used such as Combat, WaveICA, NormAE, Total Ion Count normalization, and Internal Standard normalizations are currently used batch correction methods in metabolomics, transcriptomics, and genomics data analysis. <p>
+<p> The batch correction methods used such as Combat, WaveICA, NormAE, Total Ion Count normalization, and Internal Standard normalizations are currently used batch correction methods in metabolomics, transcriptomics, and genomics data analysis.</p>
 
 --- 
-<p> Paper: **Luo's paper name**
+
+<h3>Paper: **Luo's paper name** </h3>
+
 --- 
 <h2>Table of Contents</h2> 
   * Requirements
@@ -34,6 +44,9 @@
 <h2>How to use</h2>
 <h3>Data preparation</h3>
 <p>metabolomics_data (no normalization / TIC normalization dataset obtained from SCiLs lab)</p>
+
+
+<p>batch_information (batch information file)</p>
 
 
 <p>Each pipeline consist of its own read me to follow through.<p>
