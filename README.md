@@ -43,7 +43,7 @@
 <p><b>Credits</b></p>
 
 <h2>Requirements</h2>
-<p>Visual Code Studio or Anaconda </p>
+<p>Visual Code Studio, Anaconda, R (version 4.3.3 )</p>
 
 <h2>How to use</h2>
 <h3>Data preparation</h3>
