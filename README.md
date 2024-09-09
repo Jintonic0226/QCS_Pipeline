@@ -13,11 +13,11 @@
   <tr>
     <td style="padding-right: 100px;">
       <img src="images/pipeline1.drawio.png" alt="pipeline1 drawio" height="400" width="400"/>
-      <p style="text-align: center;"><em>Figure 1: Pipeline 1 workflow</em></p>
+      <p style="text-align: center;"><em>Figure 2: Pipeline 1 workflow</em></p>
     </td>
     <td>
       <img src="images/pipeline.drawio.png" alt="pipeline drawio" height="400" width="400"/>
-      <p style="text-align: center;"><em>Figure 2: Pipeline 2 workflow</em></p>
+      <p style="text-align: center;"><em>Figure 3: Pipeline 2 workflow</em></p>
     </td>
   </tr>
 </table>
@@ -40,9 +40,10 @@
 <h2>Table of Contents</h2> 
 <p><b>Requirements</b></p>
 <p><b>How to use</b></p>
+<p><b>Credits</b></p>
 
 <h2>Requirements</h2>
-<p>Visual Code Studio or Anaconda </p>
+<p>Visual Code Studio, Anaconda, R (version 4.3.3 )</p>
 
 <h2>How to use</h2>
 <h3>Data preparation</h3>
