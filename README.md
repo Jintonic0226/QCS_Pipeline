@@ -40,6 +40,7 @@
 <h2>Table of Contents</h2> 
 <p><b>Requirements</b></p>
 <p><b>How to use</b></p>
+<p><b>Credits</b></p>
 
 <h2>Requirements</h2>
 <p>Visual Code Studio or Anaconda </p>
