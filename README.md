@@ -1,7 +1,11 @@
 <h1>Quality Control Standard Pipeline</h1>
 <p>The Quality Control Standard (QCS) pipeline was developed to help MALDI-MSI (Matrix-assisted laser desorption/ionization mass spectrometry imaging) users evaluate and correct batch effects in their experiments. This pipeline employs a novel Quality Control Standard, created by the Berta-Cillero group at the MERLN Institute in Maastricht, to monitor and control technical variations. By integrating this standard, the pipeline ensures consistency across experiments, providing a reliable method for addressing technical variation in MALDI-MSI data.</p>
 
-![workflow](images/workflow.png)
+<div align="center">
+  <img src="images/workflow.png" alt="Workflow" width="400">
+  <p><em>Figure 1: Workflow of Quality Control Standard.</em></p>
+</div>
+
 
 <p>The pipeline consists of three notebooks: Tutorial, Pipeline #1, and Pipeline #2.</p>
 
@@ -9,13 +13,14 @@
   <tr>
     <td style="padding-right: 100px;">
       <img src="images/pipeline1.drawio.png" alt="pipeline1 drawio" height="400" width="400"/>
+      <p style="text-align: center;"><em>Figure 1: Pipeline 1 workflow</em></p>
     </td>
     <td>
       <img src="images/pipeline.drawio.png" alt="pipeline drawio" height="400" width="400"/>
+      <p style="text-align: center;"><em>Figure 2: Pipeline 2 workflow</em></p>
     </td>
   </tr>
 </table>
-
 
 <p>* <b>Tutorial</b> is designed to guide users using the pipeline. It will demonstrate how we used the pipeline for experiment in Luo's paper where we conducted a three-day metabolomics batch test to demonstrate the novel QCS's sensitivity to technical variations.</p>
 
