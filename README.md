@@ -13,11 +13,11 @@
 <table align="center">
   <tr>
     <td style="padding-right: 100px;">
-      <img src="images/pipeline1.drawio.png" alt="pipeline1 drawio" height="400" width="400"/>
+      <img src="images/pipeline_1.drawio.png" alt="pipeline_1 drawio" height="400" width="400"/>
       <p style="text-align: center;"><em>Figure 2: Pipeline 1 workflow</em></p>
     </td>
     <td>
-      <img src="images/pipeline.drawio.png" alt="pipeline drawio" height="400" width="400"/>
+      <img src="images/pipeline_2.drawio.png" alt="pipeline_2 drawio" height="400" width="400"/>
       <p style="text-align: center;"><em>Figure 3: Pipeline 2 workflow</em></p>
     </td>
   </tr>
