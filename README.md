@@ -1,6 +1,7 @@
 <h1>Quality Control Standard Pipeline</h1> 
+<h3><b>Paper: ** Luo's Paper Link **</b></h3>
 
-<p>The Quality Control Standard (QCS) pipeline is designed to help MALDI-MSI (Matrix-assisted laser desorption/ionization mass spectrometry imaging) users evaluate and correct batch effects in their experiments. This pipeline utilizes a novel Quality Control Standard, created by the Berta-Cillero group at the MERLN Institute in Maastricht, to monitor and control technical variations. By integrating this standard, the pipeline ensures consistency across experiments, providing a reliable method for addressing technical variation in MALDI-MSI data.</p>
+<p>The Quality Control Standard (QCS) pipeline is designed to help MALDI-MSI (Matrix-assisted laser desorption/ionization mass spectrometry imaging) users evaluate and correct batch effects in their experiments. This pipeline employs a novel Quality Control Standard, created by the Berta-Cillero group at the MERLN Institute in Maastricht, to monitor and control technical variations (reference). By integrating this standard, the pipeline ensures consistency across experiments, providing a reliable method for addressing technical variation in MALDI-MSI data.</p>
 
 <div align="center">
   <img src="images/workflow.png" alt="Workflow" width="400">
@@ -23,7 +24,7 @@
   </tr>
 </table>
 
-<p>* <b>Tutorial</b> is designed to guide users using the pipeline. It will demonstrate how we used the pipeline for experiment in "Luo's paper" where we conducted a three-day metabolomics batch test to demonstrate the novel QCS's sensitivity to technical variations.</p>
+<p>* <b>Tutorial</b> is designed to guide users using the pipeline. It will demonstrate how we have used the pipeline for experiment in "Luo's paper" where we conducted a three-day metabolomics batch test to demonstrate the novel QCS's sensitivity to technical variations.</p>
 
 <p>* <b>Pipeline #1</b> is designed to evaluate and correct intra- and interbatch effects occurring in the QCS samples using Internal Standard Normalization. To evaluate batch effects, we used relative standard deviation (RSD) to measure of the variation occurring in the samples.</p>
 
@@ -41,10 +42,10 @@
 <h2>Table of Contents</h2> 
 <p><b>Requirements</b></p>
 <p><b>How to use</b></p>
-<p><b>Reference</b></p>
+<p><b>Installation and usage</b></p>
 
-<h2>Requirements</h2>
-<p>Visual Code Studio, Anaconda, R (version 4.3.3 )</p>
+<h2>Installation and usage</h2>
+<p>To run the pipeline, there are several options depending on the users' setup and preferences. Here, we list some examples to use the file in Juptyer Notebook, VS Code, Anaconda. To run this pipeline online, user can also use Google Colab to run the Juptyer Notebook.</p>
 
 <h2>How to use</h2>
 <h3>Data preparation</h3>
