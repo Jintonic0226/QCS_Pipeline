@@ -1,6 +1,7 @@
 <h1>Quality Control Standard Pipeline</h1> 
+<h3><b>Paper: ** Luo's Paper Link **</b></h3>
 
-<p>The Quality Control Standard (QCS) pipeline is developed to help MALDI-MSI (Matrix-assisted laser desorption/ionization mass spectrometry imaging) users evaluate and correct batch effects in their experiments. This pipeline employs a novel Quality Control Standard, created by the Berta-Cillero group at the MERLN Institute in Maastricht, to monitor and control technical variations. By integrating this standard, the pipeline ensures consistency across experiments, providing a reliable method for addressing technical variation in MALDI-MSI data.</p>
+<p>The Quality Control Standard (QCS) pipeline is designed to help MALDI-MSI (Matrix-assisted laser desorption/ionization mass spectrometry imaging) users evaluate and correct batch effects in their experiments. This pipeline employs a novel Quality Control Standard, created by the Berta-Cillero group at the MERLN Institute in Maastricht, to monitor and control technical variations (reference). By integrating this standard, the pipeline ensures consistency across experiments, providing a reliable method for addressing technical variation in MALDI-MSI data.</p>
 
 <div align="center">
   <img src="images/workflow.png" alt="Workflow" width="400">
@@ -13,25 +14,30 @@
 <table align="center">
   <tr>
     <td style="padding-right: 100px;">
-      <img src="images/pipeline1.drawio.png" alt="pipeline1 drawio" height="400" width="400"/>
+      <img src="images/pipeline_1.drawio.png" alt="pipeline_1 drawio" height="400" width="400"/>
       <p style="text-align: center;"><em>Figure 2: Pipeline 1 workflow</em></p>
     </td>
     <td>
-      <img src="images/pipeline.drawio.png" alt="pipeline drawio" height="400" width="400"/>
+      <img src="images/pipeline_2.drawio.png" alt="pipeline_2 drawio" height="400" width="400"/>
       <p style="text-align: center;"><em>Figure 3: Pipeline 2 workflow</em></p>
     </td>
   </tr>
 </table>
 
-<p>* <b>Tutorial</b> is designed to guide users using the pipeline. It will demonstrate how we used the pipeline for experiment in "Luo's paper" where we conducted a three-day metabolomics batch test to demonstrate the novel QCS's sensitivity to technical variations.</p>
+<p>* <b>Tutorial</b> is designed to guide users in using the pipeline. It demonstrates how we used the pipeline in "Luo's paper," where we conducted a three-day metabolomics batch test to demonstrate the novel QCS's sensitivity to technical variations.</p>
 
-<p>* <b>Pipeline #1</b> is designed to evaluate and correct intra- and interbatch effects occurring in the QCS samples using Internal Standard Normalization. To evaluate batch effects, we used relative standard deviation (RSD) to measure of the variation occurring in the samples.</p>
+<p>* <b>Pipeline #1</b> is designed to evaluate and correct intrabatch and interbatch variations occurring only in the QCS samples using Total Ion Count normalization or Internal Standard normalization. The measure of technical variation is based on calculating the relative standard deviation (RSD) of the QCS standard. It is recommended to first run Pipeline #1, as this can help determine any slide outliers or identify issues with sample preparation or measurement before moving on to correct batch effects in Pipeline #2.</p>
 
-<p>* <b>Pipeline #2</b> is used to assess intra- and interday batch effects in both QCS samples and artificially created tissue homogenate samples. It allows users to correct batch effects using various methods such as Combat, WaveICA, and NormAE, Total Ion Count normalization, and Internal Standard normalization. To evaluate batch effects, we used relative standard deviation (RSD) to measure the coefficient of variation occurring in the samples. As well, we perform Principal Component Analysis and assess their clusterness to evaluate the similarity of samples.</p> 
+<p>* <b>Pipeline #2</b> is designed to evaluate intrabatch and interbatch variations in both QCS samples and tissue sections prepared from artificially created tissue homogenate. It allows users to correct batch effects using various methods such as <a href="https://pubmed.ncbi.nlm.nih.gov/16632515/" target="_blank">Combat (Johnson et al., 2007)</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/30926040/" target="_blank">WaveICA (Deng et al., 2019)</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/32207605/" target="_blank">NormAE (Rong et al., 2020)</a>, Total Ion Count normalization, and Internal Standard normalization. The measure of technical variation is based on calculating the relative standard deviation (RSD) of the QCS standard and detected tissue features. The QCS RSD is regarded as a general indicator of overall technical variations derived from the MALDI-MSI workflow. The tissue feature RSD can be regarded as an indicator of intragroup variations and can vary across features. Tissue feature variation is more complex and can be influenced by many factors, such as sample heterogeneity and various batch effects. In our showcase, we used artificially created tissue homogenate; the tissue feature RSD is more representative of technical variations and was used as a reference to evaluate the practicability of applying QCS to reflect tissue variations in real cases. Additionally, the corrective effect on the clustering of tissue samples can also be assessed via Principal Component Analysis (PCA).</p>
 
 <p> As proposed in the diagram, the input used for this pipeline are no normalization dataset, TIC normalization dataset, and batch information. The no normalization dataset means a CSV file obtained from SCiLS Lab software </p>
 
 <p> The batch correction methods used such as Combat, WaveICA, NormAE, Total Ion Count normalization, and Internal Standard normalizations are currently used batch correction methods in metabolomics, transcriptomics, and genomics data analysis.</p>
+<p> Combat </p>
+<p> WaveICA </p>
+<p> NormAE </p>
+
+
 
 --- 
 
@@ -41,10 +47,10 @@
 <h2>Table of Contents</h2> 
 <p><b>Requirements</b></p>
 <p><b>How to use</b></p>
-<p><b>Reference</b></p>
+<p><b>Installation and usage</b></p>
 
-<h2>Requirements</h2>
-<p>Visual Code Studio, Anaconda, R (version 4.3.3 )</p>
+<h2>Installation and usage</h2>
+<p>To run the pipeline, there are several options depending on the users' setup and preferences. Here, we list some examples to use the file in Juptyer Notebook, VS Code, Anaconda. To run this pipeline online, user can also use Google Colab to run the Juptyer Notebook.</p>
 
 <h2>How to use</h2>
 <h3>Data preparation</h3>
