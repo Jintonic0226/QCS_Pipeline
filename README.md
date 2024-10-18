@@ -33,6 +33,7 @@
 <p> As proposed in the diagram, the input used for this pipeline are no normalization dataset, TIC normalization dataset, and batch information. The no normalization dataset means a CSV file obtained from SCiLS Lab software </p>
 
 <p> The batch correction methods used such as Combat, WaveICA, NormAE, Total Ion Count normalization, and Internal Standard normalizations are currently used batch correction methods in metabolomics, transcriptomics, and genomics data analysis.</p>
+  
 <p> Combat </p>
 <p> WaveICA </p>
 <p> NormAE </p>
@@ -54,7 +55,7 @@
 
 <h2>How to use</h2>
 <h3>Data preparation</h3>
-<p><u>metabolomics_data (no normalization / TIC normalization dataset obtained from SCiLS Lab)</u></p>
+<p><b>metabolomics_data</b> (no normalization / TIC normalization dataset obtained from SCiLS Lab)</p>
 <p>You can obtain the dataset CSV file from SCiLS Lab and it will look like below for instance where it contains m/z value and its peak data in one row for each m/z values.</p> 
 
 ```
@@ -72,7 +73,7 @@
 ```
 
 
-<p><u>batch_information (batch information file) is created by yourself as CSV file where it contains the name of peak data and injection order and batch number.</u></p>
+<p><b>batch_information </b> (batch information file) is created by yourself as CSV file where it contains the name of peak data and injection order and batch number.</p>
 
 ```
 sample.name	injection.order	batch
