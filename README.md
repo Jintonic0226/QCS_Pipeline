@@ -33,11 +33,6 @@
 <p> As proposed in the diagram, the input used for this pipeline are no normalization dataset, TIC normalization dataset, and batch information. The no normalization dataset means a CSV file obtained from SCiLS Lab software </p>
 
 <p> The batch correction methods used such as Combat, WaveICA, NormAE, Total Ion Count normalization, and Internal Standard normalizations are currently used batch correction methods in metabolomics, transcriptomics, and genomics data analysis.</p>
-  
-<p> Combat </p>
-<p> WaveICA </p>
-<p> NormAE </p>
-
 
 
 --- 
