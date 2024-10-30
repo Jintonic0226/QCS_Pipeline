@@ -2,10 +2,10 @@ Input Data Description:
 
 The metabolomics dataset was collected from a three-day metabolomics batch test using MALDI-MSI to measure 18 tissue section slides prepared from three types of animal organs. Raw data were processed via SCiLS Lab MVS 2024b Premium 3D (SCiLS GmbH, Bruker, Bremen, Germany) through the following steps:
 
-Raw data files from consecutive batches in one experiment were imported together into one SCiLS file.
-The imported mass spectrum was processed with baseline subtraction (convolution algorithm with peak width set to 20).
-Peak picking was performed based on regions of entire tissue sections. Tissue feature finding involved filtering 200 peaks from the mean spectrum across different tissue types.
-The final filtered features were stored in a tissue feature list.
+1. Raw data files from consecutive batches in one experiment were imported together into one SCiLS file.
+2. The imported mass spectrum was processed with baseline subtraction (convolution algorithm with peak width set to 20).
+3. Peak picking was performed based on regions of entire tissue sections. Tissue feature finding involved filtering 200 peaks from the mean spectrum across different tissue types.
+4. The final filtered features were stored in a tissue feature list.
 Final feature tables, including QCS features and/or tissue features, were exported in two formats: no normalization and total ion count (TIC) normalization.
 
 How to use Pipeline #2:
