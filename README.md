@@ -32,8 +32,9 @@
 
 <p> As proposed in the diagram, the input used for this pipeline are no normalization dataset, TIC normalization dataset, and batch information. The no normalization dataset means a CSV file obtained from SCiLS Lab software </p>
 
-<p> The batch correction methods used such as Combat, WaveICA, NormAE, Total Ion Count normalization, and Internal Standard normalizations are currently used batch correction methods in metabolomics, transcriptomics, and genomics data analysis.</p>
+<p>As proposed in the diagram, the inputs used for this pipeline include a non-normalized dataset, a TIC-normalized dataset, and batch information. The non-normalized dataset refers to a CSV file obtained from SCiLS Lab software.</p> 
 
+<p>The batch correction methods used, such as Combat, WaveICA, NormAE, Total Ion Count (TIC) normalization, and Internal Standard (IS) normalization, are commonly applied in metabolomics, transcriptomics, and genomics data analysis. Data normalization methods like TIC and IS normalization ensure sample comparability by scaling the samples to a consistent scale. Combat is a location-scale correction method that uses a Bayesian framework to estimate and remove batch effects by adjusting the mean and variance of the data (Johnson et al., 2007). It is applied in transcriptomics, proteomics, and metabolomics data. WaveICA is a matrix factorization method that transforms the data into wavelets with independent component analysis (ICA) to remove batch effects and is commonly used in metabolomics (Deng et al., 2019). NormAE is a deep learning-based method that uses an autoencoder neural network to learn and remove batch effects, primarily applied in metabolomics (Rong et al., 2020).</p>
 
 --- 
 
@@ -88,9 +89,9 @@ Peak area - S2_QCS_5 - Total Ion Count	13	1
 Peak area - S2_QCS_6 - Total Ion Count	14	1
 ```
 
-<h2>Reference</h2>
-1. 
-2.
+<h2>References</h2>
+Johnson, W. E., Li, C., & Rabinovic, A. (2007). Adjusting batch effects in microarray expression data using empirical Bayes methods. Biostatistics, 8(1), 118-127. doi: 10.1093/biostatistics/kxj037. PMID: 16632515.
 
+Deng, K., Zhang, F., Tan, Q., Huang, Y., Song, W., Rong, Z., Zhu, Z. J., Li, K., & Li, Z. (2019). WaveICA: A novel algorithm to remove batch effects for large-scale untargeted metabolomics data based on wavelet analysis. Analytica Chimica Acta, 1061, 60-69. doi: 10.1016/j.aca.2019.02.010. PMID: 30926040.
 
-
+Rong, Z., Tan, Q., Cao, L., Zhang, L., Deng, K., Huang, Y., Zhu, Z. J., Li, Z., & Li, K. (2020). NormAE: Deep Adversarial Learning Model to Remove Batch Effects in Liquid Chromatography Mass Spectrometry-Based Metabolomics Data. Analytical Chemistry, 92(7), 5082-5090. doi: 10.1021/acs.analchem.9b05460. PMID: 32207605.
