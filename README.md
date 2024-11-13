@@ -1,7 +1,7 @@
 <h1>Quality Control Standard Pipeline</h1> 
 <h3><b>Paper: ** Luo's Paper Link **</b></h3>
 
-<p>The Quality Control Standard (QCS) pipeline is designed to help mass spectrometry imaging (MSI) users evaluate technical variaitons and correct batch effects across MSI experiments, aiming to improve data quality for further downstream omics data analysis.</p>
+<p>This pipeline functions as an assistant computational pipeline, designed to integrate seamlessly with our established Quality Control Standards (QCSs) within mass spectrometry imaging (MSI) workflows [our paper reference]. It aims to provide data analysis capabilities including real-time monitoring of batch data quality, correction of batch effects, and pre- and post-evaluation.</p>
 
 <div align="center">
   <img src="images/workflow.png" alt="Workflow" width="400">
