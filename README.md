@@ -5,7 +5,7 @@
 
 <div align="center">
   <img src="images/workflow.png" alt="Workflow" width="400">
-  <p><em>Figure 1: Workflow of Quality Control Standard.</em></p>
+  <p><em>Figure 1: General MSI workflow for applying QCSs to tissue slide measurement and assessing data quality across slides.</em></p>
 </div>
 
 
