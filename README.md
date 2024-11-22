@@ -14,11 +14,11 @@
   <tr>
     <td style="padding-right: 100px;">
       <img src="images/pipeline_1.drawio.png" alt="pipeline_1 drawio" height="400" width="400"/>
-      <p style="text-align: center;"><em>Figure 2: Pipeline 1 workflow</em></p>
+      <p style="text-align: center;"><em>Figure 2: Pipeline 1 diagram applied for QCS samples</em></p>
     </td>
     <td>
       <img src="images/pipeline_2.drawio.png" alt="pipeline_2 drawio" height="400" width="400"/>
-      <p style="text-align: center;"><em>Figure 3: Pipeline 2 workflow</em></p>
+      <p style="text-align: center;"><em>Figure 3: Pipeline 2 diagram applied for both QCS samples and tissue sections</em></p>
     </td>
   </tr>
 </table>
