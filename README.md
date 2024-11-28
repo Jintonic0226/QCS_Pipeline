@@ -3,7 +3,7 @@
 <p>This pipeline functions as an assistant computational pipeline, designed to integrate seamlessly with our established Quality Control Standards (QCSs) within mass spectrometry imaging (MSI) workflows [our paper reference]. It aims to provide data analysis capabilities including real-time monitoring of batch data quality, correction of batch effects, and pre- and post-evaluation.</p>
 
 <div align="center">
-  <img src="images/workflow.png" alt="Workflow" width="400">
+  <img src="images/workflow.png" alt="Workflow" width="800">
   <p><em>Figure 1: General MSI workflow for applying QCSs to tissue slide measurement and assessing data quality across slides.</em></p>
 </div>
 
