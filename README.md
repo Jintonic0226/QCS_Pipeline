@@ -12,16 +12,22 @@
 
 <table align="center">
   <tr>
-    <td style="padding-right: 100px;">
-      <img src="images/pipeline_1.drawio.png" alt="pipeline_1 drawio" height="400" width="400"/>
+    <td>
+      <div style="width: 400px; height: 400px; overflow: hidden; display: flex; justify-content: center; align-items: center;">
+        <img src="images/pipeline_1.drawio.png" alt="pipeline_1 drawio" style="width: 100%; height: auto; object-fit: contain;" />
+      </div>
       <p style="text-align: center;"><em>Figure 2: Pipeline 1 diagram applied for QCS samples</em></p>
     </td>
     <td>
-      <img src="images/pipeline_2.drawio.png" alt="pipeline_2 drawio" height="400" width="400"/>
+      <div style="width: 400px; height: 400px; overflow: hidden; display: flex; justify-content: center; align-items: center;">
+        <img src="images/pipeline_2.drawio.png" alt="pipeline_2 drawio" style="width: 100%; height: auto; object-fit: contain;" />
+      </div>
       <p style="text-align: center;"><em>Figure 3: Pipeline 2 diagram applied for both QCS samples and tissue sections</em></p>
     </td>
   </tr>
 </table>
+
+
 
 <p>* <b>Tutorial</b> is designed to guide users in using the pipeline. It demonstrates how we used the pipeline in "Luo's paper," where we conducted a three-day metabolomics batch test to demonstrate the novel QCS's sensitivity to technical variations.</p>
 
