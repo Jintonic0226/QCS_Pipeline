@@ -14,13 +14,13 @@
   <tr>
     <td>
       <div style="width: 400px; height: 400px; overflow: hidden; display: flex; justify-content: center; align-items: center;">
-        <img src="images/pipeline_1.drawio.png" alt="pipeline_1 drawio" style="width: 100%; height: auto; object-fit: contain;" />
+        <img src="images/pipeline1.drawio.png" alt="pipeline_1 drawio" style="width: 100%; height: auto; object-fit: contain;" />
       </div>
       <p style="text-align: center;"><em>Figure 2: Pipeline 1 diagram applied for QCS samples</em></p>
     </td>
     <td>
       <div style="width: 400px; height: 400px; overflow: hidden; display: flex; justify-content: center; align-items: center;">
-        <img src="images/pipeline_2.drawio.png" alt="pipeline_2 drawio" style="width: 100%; height: auto; object-fit: contain;" />
+        <img src="images/pipeline2.drawio.png" alt="pipeline_2 drawio" style="width: 100%; height: auto; object-fit: contain;" />
       </div>
       <p style="text-align: center;"><em>Figure 3: Pipeline 2 diagram applied for both QCS samples and tissue sections</em></p>
     </td>
