@@ -30,7 +30,16 @@ Pipeline 1            |  Pipeline 2
 <p><b>Reference</b></p>
 
 <h2>Installation and Usage</h2> 
-<p>To run the pipeline, users have several options depending on their setup and preferences. Below are examples of how to use the file in Jupyter Notebook, VS Code, and Anaconda. For online execution, users can also run the Jupyter Notebook on Google Colab.</p> <p><b>If you would like to run the pipeline via Anaconda, you can follow this setup:</b></p> <ul> <li>Install Anaconda from <a href="https://www.anaconda.com/">https://www.anaconda.com/</a></li> <li>Set up an R environment by following the instructions at <a href="https://docs.anaconda.com/free/working-with-conda/packages/using-r-language/#">this link</a></li> <li>Activate the newly created R environment</li> <li>Install the R package <code>IRkernel</code></li> <li>Open JupyterLab through Anaconda Navigator or the Anaconda Prompt</li> <li>Open the file <code>Pipeline_#1.ipynb</code> to run</li> </ul> <p><b>If you would like to run the pipeline via Visual Studio Code, you can follow this setup:</b></p> <ul> <li>Install R version 4.3.3 from <a href="https://www.r-project.org/">https://www.r-project.org/</a></li> <li>Install the R package <code>IRkernel</code></li> <li>Install Python version 3.3 or greater from <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a></li> <li>Install the Python library <code>jupyter</code></li> <li>Install Visual Studio Code from <a href="https://code.visualstudio.com/">https://code.visualstudio.com/</a></li> <li>Set up Visual Studio Code to work with R by following instructions from <a href="https://code.visualstudio.com/docs/languages/r">this link</a></li> <li>Open the file <code>Pipeline_#1.ipynb</code> in Visual Studio Code</li> <li>Select <code>Kernel</code> → <code>Jupyter Kernel</code> → <code>R</code> (from the computer)</li> <li>Run <code>Pipeline_#1.ipynb</code></li> </ul>
+
+<p>To run the pipeline in a Jupyter Notebook, users can choose from multiple options based on
+their setup and preferences:</p>
+
+1. Online Execution: Quickly get started using Google Colab, which allows you to run the
+pipeline in a cloud-based environment without any local setup.
+2. Local Execution: Run the pipeline on your local machine using Jupyter Notebook, VS Code,
+or Anaconda, depending on your preferred tool.
+Additionally, the pipeline is also available as R Markdown files for those who prefer working in
+an R-based environment.
 
 <h2>How to use</h2>
 <h3>Input data preparation</h3>
