@@ -10,22 +10,10 @@
 
 <p>The pipeline consists of three notebooks: Tutorial, Pipeline #1, and Pipeline #2.</p>
 
-<table align="center">
-  <tr>
-    <td>
-      <div style="width: 400px; height: 400px; overflow: hidden; display: flex; justify-content: center; align-items: center;">
-        <img src="images/pipeline1.drawio.png" alt="pipeline_1 drawio" style="width: 100%; height: auto; object-fit: contain;" />
-      </div>
-      <p style="text-align: center;"><em>Figure 2: Pipeline 1 diagram applied for QCS samples</em></p>
-    </td>
-    <td>
-      <div style="width: 400px; height: 400px; overflow: hidden; display: flex; justify-content: center; align-items: center;">
-        <img src="images/pipeline2.drawio.png" alt="pipeline_2 drawio" style="width: 100%; height: auto; object-fit: contain;" />
-      </div>
-      <p style="text-align: center;"><em>Figure 3: Pipeline 2 diagram applied for both QCS samples and tissue sections</em></p>
-    </td>
-  </tr>
-</table>
+Pipeline1            |  Pipeline2
+:-------------------------:|:-------------------------:
+![Pipeline1](images/pipeline1.drawio.png)  |  ![Pipeline2](images/pipeline2.drawio.png)
+<em>Figure 1: Pipeline 1 diagram applied for QCS samples.</em> | <em>Figure 2: Pipeline 2 diagram applied for both QCS samples and tissue sections.</em>
 
 
 
