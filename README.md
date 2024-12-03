@@ -2,22 +2,18 @@
 
 <p>This pipeline functions as an assistant computational pipeline, designed to integrate seamlessly with our established Quality Control Standards (QCSs) within mass spectrometry imaging (MSI) workflows [our paper reference]. It aims to provide data analysis capabilities including real-time monitoring of batch data quality, correction of batch effects, and pre- and post-evaluation.</p>
 
-<div align="center">
-  <img src="images/workflow.png" alt="Workflow" width="800">
-  <p><em>Figure 1: General MSI workflow for applying QCSs to tissue slide measurement and assessing data quality across slides.</em></p>
-</div>
 
+Workflow |
+:-------------------------:|
+![Workflow](images/workflow.png)  | 
+<em>Figure 1: General MSI workflow for applying QCSs to tissue slide measurement and assessing data quality across slides.</em>
 
-<p>The pipeline consists of three notebooks: Tutorial, Pipeline #1, and Pipeline #2.</p>
+<p>The pipeline consists of two notebooks: Pipeline #1, and Pipeline #2.</p>
 
-Pipeline1            |  Pipeline2
+Pipeline 1            |  Pipeline 2
 :-------------------------:|:-------------------------:
 ![Pipeline1](images/pipeline1.drawio.png)  |  ![Pipeline2](images/pipeline2.drawio.png)
-<em>Figure 1: Pipeline 1 diagram applied for QCS samples.</em> | <em>Figure 2: Pipeline 2 diagram applied for both QCS samples and tissue sections.</em>
-
-
-
-<p>* <b>Tutorial</b> is designed to guide users in using the pipeline. It demonstrates how we used the pipeline in "Luo's paper," where we conducted a three-day metabolomics batch test to demonstrate the novel QCS's sensitivity to technical variations.</p>
+<em>Figure 2: Pipeline 1 diagram applied for QCS samples.</em> | <em>Figure 3: Pipeline 2 diagram applied for QCS samples and tissue sections.</em>
 
 <p>* <b>Pipeline #1</b> is designed to evaluate and correct intrabatch and interbatch variations occurring only in the QCS samples using Total Ion Count normalization or Internal Standard normalization. The measure of technical variation is based on calculating the relative standard deviation (RSD) of the QCS standard. It is recommended to first run Pipeline #1, as this can help determine any slide outliers or identify issues with sample preparation or measurement before moving on to correct tissue samples batch effects in Pipeline #2.</p>
 
