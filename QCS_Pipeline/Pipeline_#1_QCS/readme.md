@@ -10,16 +10,13 @@ Final feature tables, including QCS features and/or tissue features, were export
 
 <h1>How to use Pipeline #1:</h1>
 
--Upload 3 CSV files into the input folder: no normalization dataset, TIC (Total Ion Count) normalization dataset, and batch information.
+1. Upload 3 CSV files into the input folder: no normalization dataset, TIC (Total Ion Count) normalization dataset, and batch information.
+2. Provide file paths for the 3 CSV files, QCS m/z values, and tissue type names (sample_set) in the input information cell.
+3. Run everything in order by either clicking the run button or pressing Shift + Enter:
+   1) Preprocessing datasets (no normalization, TIC normalization, IS normalization)
+   2) RSD calculation
+   3) Intensity plot
+   4) Violin plot
+   5) Output (CSV files of each dataset, Excel sheets of each dataset with intra/inter-batch, and overview result PDF). For the Excel sheet, the system will prompt you to enter the number of batches in the dataset.
 
--Provide file paths for the 3 CSV files, QCS m/z values, and tissue type names (sample_set) in the input information cell.
-
--Run everything in order by either clicking the run button or pressing Shift + Enter:
-
-1. Preprocessing datasets (no normalization, TIC normalization, IS normalization)
-2. RSD calculation
-3. Intensity plot
-4. Violin plot
-5. Output (CSV files of each dataset, Excel sheets of each dataset with intra/inter-batch, and overview result PDF). For the Excel sheet, the system will prompt you to enter the number of batches in the dataset.
-
--If you change the input dataset, you will still need to run all the cells to see the updates.
+5. If you change the input dataset, you will still need to run all the cells to see the updates.
