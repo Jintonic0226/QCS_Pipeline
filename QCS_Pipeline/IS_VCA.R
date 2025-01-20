@@ -1,3 +1,5 @@
+version
+
 ## IS Normalization ##
 # read QCS data
 library(dplyr)
@@ -18,7 +20,7 @@ extract_qcs_data <- function(dataset, sample_set) {
 
 
 # Dataset Upload
-rawdata <- read.csv("Pipeline_#2_(QCS+Tissue)/Dataset/formatted_IS_norm_batch_data.csv",
+rawdata <- read.csv("Pipeline_#1_QCS/Dataset/formatted_IS_norm_batch_data.csv",
                     row.names = 1,
                     check.names = FALSE
 ) 

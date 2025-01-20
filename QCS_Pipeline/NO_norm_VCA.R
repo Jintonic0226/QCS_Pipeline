@@ -18,7 +18,7 @@ extract_qcs_data <- function(dataset, sample_set) {
 
 
 # Dataset Upload
-rawdata <- read.csv("Pipeline_#2_(QCS+Tissue)/Dataset/formatted_no_norm_combined_batch_data.csv",
+rawdata <- read.csv("Pipeline_#1_QCS/Dataset/formatted_no_norm_combined_batch_data.csv",
                     row.names = 1,
                     check.names = FALSE
                     ) #126x121
