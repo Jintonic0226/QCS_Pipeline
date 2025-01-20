@@ -117,4 +117,39 @@ varPlot(form = scale ~ day/slide/row,
 # Adding Title
 title(main = "No Normalization Dataset (IS)")
 
+# function
+
+# Define the function to process and plot the VCA data
+plot_vca_data <- function(data, qcs_mz_value, is_mz_value, plot_title) {
+  # Adding columns to the dataset (assuming the add_day_slide_row function exists)
+  data <- add_day_slide_row(data)
+  
+  # Replacing column name values with QCS/IS
+  colnames(data)[colnames(data) == as.character(qcs_mz_value)] <- "QCS"
+  colnames(data)[colnames(data) == as.character(is_mz_value)] <- "IS"
+  
+  ## VCA Plotting ## 
+  # QCS data processing
+  plot_data <- data %>%
+    as.data.frame() %>%
+    select(c("injection.order", "batch", "QCS", "row", "slide", "day")) %>%
+    mutate(scale = scale(QCS))  # Scaling QCS column
+  
+  # VCA plotting
+  varPlot(form = scale ~ day/slide/row, 
+          Data = plot_data,
+          YLabel = list(text = "Raw peak area, scaling", side = 2, line = 2, cex = 1),
+          MeanLine = list(var = c("int", "slide", "day"), 
+                          col = c("white", "blue", "magenta"), lwd = c(2, 2, 2)), 
+          BG = list(var = "day", col = paste0("gray", c(70, 80, 90))))
+  
+  # Adding dynamic title to the plot
+  title(main = plot_title)
+}
+
+# Example of calling the function with a dynamic title
+no_normalization <- plot_vca_data(propranolol_data_combat, QCS_mz_value_2, IS_mz_value_2, "Propranolol Dataset (QCS)")
+plot_vca_data(d7_propranolol_data_combat, QCS_mz_value_2, IS_mz_value_2, "D7 Propranolol Dataset (QCS)")
+
+
 dev.off()

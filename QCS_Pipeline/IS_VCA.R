@@ -1,5 +1,10 @@
+.libPaths("/opt/anaconda3/envs/r_442/lib/R/library")
+
 version
 library(kableExtra)
+library(VCA)
+install.packages("VCA")
+
 packageStatus()
 
 packageVersion("nloptr")
