@@ -1,4 +1,5 @@
 version
+library(kableExtra)
 
 ## IS Normalization ##
 # read QCS data
