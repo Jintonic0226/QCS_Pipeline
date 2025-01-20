@@ -1,5 +1,11 @@
 version
 library(kableExtra)
+packageStatus()
+
+packageVersion("nloptr")
+
+
+
 
 ## IS Normalization ##
 # read QCS data
