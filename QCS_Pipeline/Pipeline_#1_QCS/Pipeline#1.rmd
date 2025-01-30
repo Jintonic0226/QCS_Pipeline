@@ -1,0 +1,1655 @@
+---
+jupyter:
+  kernelspec:
+    display_name: R
+    language: R
+    name: ir
+  language_info:
+    codemirror_mode: r
+    file_extension: .r
+    mimetype: text/x-r-source
+    name: R
+    pygments_lexer: r
+    version: 4.4.2
+  nbformat: 4
+  nbformat_minor: 5
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+::: {#overview .cell .markdown}
+## Pipeline #1: Quality Control Standards (QCS) Evaluation
+
+In this pipeline, you will evaluate your Quality Control Standards (QCS)
+using three types of data normalization:
+
+1.  No normalization data
+2.  Total ion count normalization data
+3.  Internal standard normalization data
+
+To assess the variation of QCS throughout intra/interday batches, you
+will use the following methods:
+
+-   **Relative Standard Deviation (RSD) Calculation:** Serves as a
+    measure of the Coefficient of Variation (CV).
+-   **Intensity Plot:** Visualizes the trend between peak intensities
+    and the measurement order.
+-   **Violin Plot:** Visualizes the distribution of peak intensities at
+    different measurement orders.
+
+You can also check README file to follow through the pipeline. You can
+either press the run button or press **Shift + Enter** to run each cell.
+:::
+
+::: {#index .cell .markdown}
+## Index
+
+You can click these to go to specific part (recommended to do after
+running the whole pipeline)
+
+1.  [Packages to Download](#package_1)
+2.  [Input Information](#input_1)
+3.  [Preprocessing Datasets](#preprocessing_1)
+4.  [RSD Calculation](#rsd_1)
+5.  [Visualization](#visualization_1)
+6.  [Output](#output_1)
+:::
+
+::: {#package .cell .markdown}
+## Packages to Download {#package_1}
+
+```{r}
+# Checking for version
+version
+```
+:::
+
+::: {#package2 .cell .markdown}
+```{r}
+# Packages for RSD overview table 
+packages_RSD <- c("htmltools", "kableExtra", "IRdisplay")
+
+# Packages for Violin plot #
+packages_violin <- c("ggplot2", "dplyr", "RColorBrewer", "gridExtra")
+
+# Package for PCA plot #
+packages_output <- c("png", "grid")
+
+# Package for excel sheet creating #
+packages_excel <- c("openxlsx")
+
+# Package for VCA plot #
+packages_vca <- c("VCA")
+
+# Combine all package lists #
+all_packages <- c(packages_RSD, packages_violin, packages_output, packages_excel, packages_vca)
+
+# Install packages if not installed #
+for (pkg in all_packages) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+  }
+}
+
+# Check if all packages are installed #
+if (all(sapply(all_packages, requireNamespace, quietly = TRUE))) {
+  cat("\033[1mSuccessfully Downloaded Packages\033[0m\n")
+} else {
+  cat("Some packages were not successfully installed.\n")
+}
+```
+:::
+
+:::: {#input_info .cell .markdown}
+## Input Information {#input_1}
+
+::: {style="text-align: center;"}
+<img src="Image/instruction.png" alt="Instruction Image" style="width:80%;"/>
+:::
+
+**Upload these files in input folder**
+
+1)  **Data matrix for No normalization** (CSV file obtained from SCiLS
+    Lab directly)
+2)  **Data matrix for TIC normalization** (CSV file obtained from SCiLS
+    Lab directly)
+3)  **Batch info (CSV file with batch information for sample
+    construction)** (check the given example file called
+    'batch_info_TIC' - must have "injection.order" and "batch" column)
+
+**These will need to be changed in the cell below:**
+
+1.  **File path for above 3 files**
+2.  **QCS Analytes mass-to-charge ratio (m/z) values** (ie: propranolol
+    260.16, D7-propranolol 267.14) (\*if using VS code, input at the top
+    bar)
+3.  **Sample set (tissue sample names, check the example given)**
+::::
+
+::: {#input_info2 .cell .markdown}
+```{r}
+# Please edit the file path, file name #
+# Please only edit areas with ## ##
+
+no_normalization_data_1 <- read.csv("Input/119feature_T&QCS_BaseRemoval_noNorm.csv", ## change file path ##
+                                  header = FALSE,
+                                  check.names = FALSE,
+                                  stringsAsFactors = FALSE)
+
+TIC_normalization_data_1 <- read.csv("Input/119feature_T&QCS_BaseRemoval_TICNorm.csv", ## change file path ##
+                                   header = FALSE,
+                                   check.names = FALSE,
+                                   stringsAsFactors = FALSE) 
+
+QCS_mz_value_1 <- as.numeric(readline("Please enter QCS (ie: propranolol) m/z value: ")) ## ie: 260.186 ##
+
+IS_mz_value_1 <- as.numeric(readline("Please enter Internal Standard (ie: d7-propranolol) m/z value: ")) ## ie: 267.187 ##
+
+batch_info_1 <- read.csv("Input/batch_info_TIC.csv", ## change file path ##
+                       header = TRUE,
+                       check.names = FALSE,
+                       stringsAsFactors = FALSE) 
+
+sample_set_1 <- c("ChickenHeart", "ChickenLiver", "GoatLiver") ## change sample type names ##
+```
+:::
+
+::: {#input_info3 .cell .markdown}
+```{r}
+# Check if "injection.order" column exists
+if ("injection.order" %in% colnames(batch_info_1)) {
+    cat("\033[1mColumn 'injection.order' exists\033[0m\n")
+} else {
+    cat("\033[1mColumn 'injection.order' does not exist. Please check/edit colname for batch_info\033[0m\n")
+}
+
+if ("batch" %in% colnames(batch_info_1)) {
+    cat("\033[1mColumn 'batch' exists.\033[0m\n")
+} else {
+    cat("\033[1mColumn 'batch' does not exist. Please check/edit colname for batch_info\033[0m\n")
+}
+```
+:::
+
+::: {#input_info4 .cell .markdown}
+```{r}
+## Creating result, dataset, output folders ##
+
+# Saves each result in the result folder
+if (!dir.exists("Excel")) {
+  dir.create("Excel")
+}
+
+# Saves each result in the dataset folder
+if (!dir.exists("Dataset")) {
+  dir.create("Dataset")
+}
+
+# Saves each result in the output folder
+if (!dir.exists("Output")) {
+  dir.create("Output")
+}
+```
+:::
+
+::: {#dataset .cell .markdown}
+## Pre-processing Datasets {#preprocessing_1}
+
+Here we will preprocess the given dataset into three separate datasets:
+No normalization, TIC normalization, and IS normalization for further
+analysis
+
+-   **No normalization dataset** refers to the original dataset without
+    any normalization applied.
+
+-   **Total Ion Count (TIC) normalization dataset** is obtained by
+    dividing peak abundance by the sum of all detected peaks.
+
+-   **Internal Standard (IS) normalization dataset** is obtained by
+    dividng peak abundance of propranolol by the abundance of its
+    internal standard (propranolol-d7).
+
+In this pipeline, no normalization dataset and TIC normalization dataset
+are exported from SCiLS Lab MVS 2024b Premium 3D. IS normalization
+dataset is calculated in the pipeline.
+:::
+
+:::::::::::::::::::::::::::::::::::: {#no_norm .cell .markdown}
+## No Normalization Dataset
+
+```{r}
+### Making formatted table no_normalization ###
+# Read the CSV file
+rawdata <- no_normalization_data_1
+mz_header <- unlist(strsplit(as.character(rawdata[9, 1]), ";"))[1]
+peak_header <- unlist(strsplit(as.character(rawdata[9, 1]), ";"))[5:length(unlist(strsplit(as.character(rawdata[9, 1]), ";")))]
+peak <- unlist(strsplit(as.character(rawdata[10, 1]), ";"))[5:length(unlist(strsplit(as.character(rawdata[9, 1]), ";")))]
+
+mz_data_list <- list()
+peak_data_list <- list()
+combined_batch_data_list <- list()
+
+# Extract data into datalist
+for (i in 10:nrow(rawdata)){
+  mz <- unlist(strsplit(as.character(rawdata[[i, 1]]), ";"))[1]
+  peak <- unlist(strsplit(as.character(rawdata[i, 1]), ";"))[5:length(unlist(strsplit(as.character(rawdata[9, 1]), ";")))]
+  mz_data_list[[i - 9]] <- mz
+  peak_data_list[[i - 9]] <- peak
+  combined_batch_data <- c(mz, peak)
+  combined_batch_data_list[[i - 9]] <- combined_batch_data
+}
+
+# Combine data into a data frame
+combined_batch_data_df <- as.data.frame(do.call(rbind, combined_batch_data_list), stringsAsFactors = FALSE)
+
+# Set column names as mz 
+colnames(combined_batch_data_df) <- c("mz", peak_header)
+
+# make name column (will be same as mz column)
+combined_batch_data_df$name <- combined_batch_data_df$mz 
+
+# Set 'rt' column to a constant value
+combined_batch_data_df$rt <- 666 # Assigning rt a random number
+
+# Reorder columns again
+combined_batch_data_df <- combined_batch_data_df[, c("name", "mz", "rt", peak_header)]
+
+# check if each sample set exist in columns
+sample_set_exist <- logical(length(sample_set_1))
+
+# Check if each sample set exists in any of the column names
+for (i in seq_along(sample_set_1)) {
+  sample_set_exist[i] <- any(grepl(sample_set_1[i], colnames(combined_batch_data_df)))
+}
+
+# Identify sample sets that do not exist in any column names
+missing_sample_sets <- sample_set_1[!sample_set_exist]
+
+if (length(missing_sample_sets) > 0) {
+  message("Error: The following sample sets do not exist in any column names: ", paste(missing_sample_sets, collapse = ", ", "check your sample_set"))
+} else {
+  message("Successfully made formatted table. All sample sets exist in at least one column name.")
+}
+
+# Check if m/z values exist in rows
+propranolol_mz_exist <- any(combined_batch_data_df$mz == QCS_mz_value_1)
+d7_propranolol_mz_exist <- any(combined_batch_data_df$mz == IS_mz_value_1)
+
+# Print messages based on existence
+if (!propranolol_mz_exist) {
+  message("Error: The QCS m/z value ", QCS_mz_value_1, " does not exist in any row.")
+} else {
+  message("The QCS m/z value ", QCS_mz_value_1, " exists in at least one row.")
+}
+
+if (!d7_propranolol_mz_exist) {
+  message("Error: The Internal Standard m/z value ", IS_mz_value_1, " does not exist in any row.")
+} else {
+  message("The Internal Standard m/z value ", IS_mz_value_1, " exists in at least one row.")
+}
+
+# uncomment to check if combined_batch_data_df looks correct and if sample names are correct
+#print(combined_batch_data_df)
+#print(colnames(combined_batch_data_df))
+
+# making as a formatted csv file
+write.csv(combined_batch_data_df,
+          file = "Dataset/formatted_no_norm_batch_data.csv",
+          row.names = FALSE)
+
+## Make batch info combined dataframe ##
+# dataframe with injection order, batch info, batch data
+combined_batch_data_df_transposed <- as.data.frame(t(combined_batch_data_df[, -(1:3)]))
+colnames(combined_batch_data_df_transposed) <- combined_batch_data_df[, 1]
+combined_batch_info_data <- cbind(batch_info_1[,-1], combined_batch_data_df_transposed) 
+
+# making as a formatted csv file
+write.csv(combined_batch_info_data,
+          file = "Dataset/formatted_no_norm_combined_batch_data.csv",
+          row.names = TRUE)
+
+cat("\033[1mSuccessfully formmated no normalized datasets (check Dataset folder)\033[0m\n")
+```
+
+::: {#tic_norm .cell .markdown}
+## TIC Normalization Dataset
+
+```{r}
+### Making formatted table TIC_normalization ###
+# Read the CSV file
+rawdata <- TIC_normalization_data_1
+mz_header <- unlist(strsplit(as.character(rawdata[9, 1]), ";"))[1]
+peak_header <- unlist(strsplit(as.character(rawdata[9, 1]), ";"))[5:length(unlist(strsplit(as.character(rawdata[9, 1]), ";")))]
+peak <- unlist(strsplit(as.character(rawdata[10, 1]), ";"))[5:length(unlist(strsplit(as.character(rawdata[9, 1]), ";")))]
+
+mz_data_list <- list()
+peak_data_list <- list()
+combined_batch_data_list <- list()
+
+# Extract data
+for (i in 10:nrow(rawdata)){
+  mz <- unlist(strsplit(as.character(rawdata[[i, 1]]), ";"))[1]
+  peak <- unlist(strsplit(as.character(rawdata[i, 1]), ";"))[5:length(unlist(strsplit(as.character(rawdata[9, 1]), ";")))]
+  mz_data_list[[i - 9]] <- mz
+  peak_data_list[[i - 9]] <- peak
+  combined_batch_data <- c(mz, peak)
+  combined_batch_data_list[[i - 9]] <- combined_batch_data
+}
+
+# Combine data into a data frame
+combined_batch_data_df_TIC <- as.data.frame(do.call(rbind, combined_batch_data_list), stringsAsFactors = FALSE)
+
+# Set column names
+colnames(combined_batch_data_df_TIC) <- c("mz", peak_header)
+
+# make name column
+combined_batch_data_df_TIC$name <- combined_batch_data_df_TIC$mz  # Assign 'name' column which is same as mz column
+
+# Set 'rt' column to a constant value
+combined_batch_data_df_TIC$rt <- 666 # Assigning rt a random number
+
+# Reorder columns again
+combined_batch_data_df_TIC <- combined_batch_data_df_TIC[, c("name", "mz", "rt", peak_header)]
+
+# uncomment to check 
+#print(combined_batch_data_df)
+#print(colnames(combined_batch_data_df))
+
+# making as a formatted csv file
+write.csv(combined_batch_data_df_TIC,
+          file = "Dataset/formatted_TIC_norm_batch_data.csv",
+          row.names = FALSE)
+
+## Make batch info combined dataframe ##
+# dataframe with injection order, batch info, batch data
+combined_batch_data_df_transposed_TIC <- as.data.frame(t(combined_batch_data_df_TIC[, -(1:3)]))
+colnames(combined_batch_data_df_transposed_TIC) <- combined_batch_data_df_TIC[, 1]
+combined_batch_info_data_TIC <- cbind(batch_info_1[,-1], combined_batch_data_df_transposed_TIC)  
+
+# making as a formatted csv file for batch info data
+write.csv(combined_batch_info_data_TIC,
+          file = "Dataset/formatted_TIC_norm_combined_batch_data.csv",
+          row.names = TRUE)
+
+cat("\033[1mSucessfully formatted TIC normalized datasets (check Dataset folder).\033[0m\n")
+```
+:::
+
+::: {#is_norm .cell .markdown}
+## IS Normalization Dataset
+
+```{r}
+# IS normalization on no normalized dataset
+# extract tissue samples away function
+extract_qcs_data <- function(dataset, sample_set) {
+  pattern <- paste(sample_set, collapse = "|")
+  
+  # Extract tissue rows
+  tissue_rows <- grep(pattern, rownames(dataset))
+  
+  # Subset dataframe to exclude tissue rows
+  qcs_data <- dataset[-tissue_rows, , drop = FALSE]
+  
+  return(qcs_data)
+}
+
+# get rid of tissue samples
+qcs_batch_info_data <- extract_qcs_data(combined_batch_info_data, sample_set_1)
+batch_info_columns <- qcs_batch_info_data[, 1:2, drop = FALSE]
+
+# extract qcs data
+# propranolol
+propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == QCS_mz_value_1, drop = FALSE]
+col_names <- rownames(propranolol_peak_data)
+propranolol_data <- cbind(batch_info_columns, propranolol_peak_data)
+
+propranolol_peak_data_trans <- as.data.frame(t(propranolol_peak_data))
+colnames(propranolol_peak_data_trans) <- col_names 
+propranolol_peak_data_trans <- as.numeric(propranolol_peak_data_trans)
+
+# IS 
+d7_propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == IS_mz_value_1, drop = FALSE]
+col_names <- rownames(d7_propranolol_peak_data)
+d7_propranolol_data <- cbind(batch_info_columns, d7_propranolol_peak_data)
+
+d7_propranolol_peak_data_trans <- as.data.frame(t(d7_propranolol_peak_data))
+colnames(d7_propranolol_peak_data_trans) <- col_names 
+d7_propranolol_peak_data_trans <- as.numeric(d7_propranolol_peak_data_trans)
+
+# IS normalization
+ratio <- propranolol_peak_data_trans / d7_propranolol_peak_data_trans
+ratio_df <- as.data.frame(ratio)
+rownames(ratio_df) <- col_names
+ratio_data <- cbind(batch_info_columns,ratio_df)
+
+ratio_data_csv <- as.data.frame(t(ratio_data))
+rownames(ratio_data_csv) <- colnames(ratio_data)
+#print(ratio_data_app_csv)
+
+# making as a formatted csv file
+write.csv(ratio_data_csv,
+          file = "Dataset/formatted_IS_norm_batch_data.csv",
+          row.names = TRUE)
+
+cat("\033[1mSucessfully formatted IS normalization dataset (check Dataset folder).\033[0m\n")
+```
+:::
+
+::: {#RSD_calculation .cell .markdown}
+## RSD Calculation {#rsd_1}
+
+```{r}
+## run these functions first ##
+# 1: Function to extract tissue samples away function
+extract_qcs_data <- function(dataset, sample_set) {
+  pattern <- paste(sample_set, collapse = "|")
+  
+  # Extract tissue rows
+  tissue_rows <- grep(pattern, rownames(dataset))
+  
+  # Subset dataframe to exclude tissue rows
+  qcs_data <- dataset[-tissue_rows, , drop = FALSE]
+  
+  return(qcs_data)
+}
+# 2. Function to calculate RSD
+calculate_rsd <- function(data) {
+  sd_value <- sd(data)
+  mean_value <- mean(data)
+  rsd <- (sd_value / mean_value) * 100
+  return(rsd)
+}
+
+# 3. Function to calculate rsd for each batch
+calculate_batch_rsd <- function(data, mz_value) {
+  # Convert mz_value to character
+  mz_value <- as.character(mz_value)
+  # Convert column to numeric
+  data[[mz_value]] <- as.numeric(data[[mz_value]], na.rm = TRUE)
+  # Calculate RSD for each batch, rounding to two decimal places
+  batch_rsd <- aggregate(data[[mz_value]],
+                         by = list(batch = data$batch),
+                         FUN = function(x) round(calculate_rsd(x), 3))
+  # Rename columns
+  colnames(batch_rsd) <- c("Batch", "RSD")
+  # Calculate interday RSD, rounding to two decimal places
+  interday_rsd <- round(calculate_rsd(data[[mz_value]]), 3)
+  # Create a new row for interday RSD
+  interday_row <- data.frame(Batch = "Interday", RSD = interday_rsd)
+  # Combine batch_rsd with interday_rsd
+  batch_rsd <- rbind(batch_rsd, interday_row)
+  # Replace all RSD values with percentage symbol
+  batch_rsd$RSD <- paste0(batch_rsd$RSD, "%")
+  # Replace batch labels with "Intraday 1", "Intraday 2", "Intraday 3"
+  batch_rsd$Batch <- ifelse(batch_rsd$Batch == "Interday", "Interday", paste0("Intraday ", batch_rsd$Batch))
+  
+  return(batch_rsd)
+}
+```
+:::
+
+::: {#no_norm_rsd .cell .r}
+```{r}
+## No Normalization RSD ##
+# get rid of tissue samples
+qcs_batch_info_data <- extract_qcs_data(combined_batch_info_data, sample_set_1)
+batch_info_columns <- qcs_batch_info_data[, 1:2, drop = FALSE]
+
+# extract qcs data
+propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == QCS_mz_value_1, drop = FALSE]
+propranolol_data <- cbind(batch_info_columns, propranolol_peak_data)
+
+d7_propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == IS_mz_value_1, drop = FALSE]
+d7_propranolol_data <- cbind(batch_info_columns, d7_propranolol_peak_data)
+
+# usage:
+rsd_propranolol <- calculate_batch_rsd(propranolol_data, QCS_mz_value_1)
+cat("\033[1mSucessfully calculated rsd (QCS) for no normalized dataset.\033[0m\n")
+cat("m/z value:", QCS_mz_value_1, "\n")
+print(rsd_propranolol)
+                           
+rsd_d7_propranolol <- calculate_batch_rsd(d7_propranolol_data, IS_mz_value_1)
+cat("\033[1mSucessfully calculated rsd (Internal Standard) for no normalized dataset.\033[0m\n")
+cat("m/z value:", IS_mz_value_1, "\n")
+print(rsd_d7_propranolol)
+```
+:::
+
+::: {#tic_norm_rsd .cell .r}
+```{r}
+## TIC Normalization RSD ##
+# get rid of tissue samples
+qcs_batch_info_data <- extract_qcs_data(combined_batch_info_data_TIC, sample_set_1)
+batch_info_columns <- qcs_batch_info_data[, 1:2, drop = FALSE]
+
+# extract qcs data
+propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == QCS_mz_value_1, drop = FALSE]
+propranolol_data_TIC <- cbind(batch_info_columns, propranolol_peak_data)
+
+d7_propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == IS_mz_value_1, drop = FALSE]
+d7_propranolol_data_TIC <- cbind(batch_info_columns, d7_propranolol_peak_data)
+
+# usage:                      
+rsd_propranolol_TIC <- calculate_batch_rsd(propranolol_data_TIC, QCS_mz_value_1)
+cat("\033[1mSucessfully calculated rsd (QCS) for TIC normalized dataset.\033[0m\n")
+cat("m/z value:", QCS_mz_value_1, "\n")
+print(rsd_propranolol_TIC)
+                           
+rsd_d7_propranolol_TIC <- calculate_batch_rsd(d7_propranolol_data_TIC, IS_mz_value_1)
+cat("\033[1mSucessfully calculated rsd (Internal Standard) for TIC normalized dataset.\033[0m\n")
+cat("m/z value:", IS_mz_value_1, "\n")
+print(rsd_d7_propranolol_TIC)
+```
+:::
+
+::: {#is_norm_rsd .cell .r}
+```{r}
+rsd_ratio <- calculate_batch_rsd(ratio_data, "ratio")
+cat("\033[1mSuccessfully calculated RSD (QCS / Internal) for IS normalization dataset.\033[0m\n")
+cat("m/z value:", "IS_Norm", "\n")
+print(rsd_ratio)
+```
+:::
+
+::: {#rsd_overview .cell .r}
+## RSD Overview Table
+
+```{r}
+library(kableExtra)
+library(IRdisplay)
+
+# Dynamically create the overview table
+overview_table_pro <- data.frame(
+  Row_Names = rsd_propranolol$Batch,
+  No_Norm_RSD = rsd_propranolol$RSD,
+  TIC_Norm_RSD = rsd_propranolol_TIC$RSD,
+  IS_Norm_RSD = rsd_ratio$RSD
+)
+
+# Set the column names dynamically
+colnames(overview_table_pro) <- c("Batch", "No_norm", "TIC_norm", "IS_norm")
+print(overview_table_pro)
+```
+:::
+
+::: {#rsd_overview2 .cell .r}
+```{r}
+library(kableExtra)
+library(htmltools)
+library(IRdisplay)
+
+# Dynamically create the overview table
+overview_table_pro <- data.frame(
+  Row_Names = rsd_d7_propranolol$Batch,
+  No_Norm_RSD = rsd_d7_propranolol$RSD,
+  TIC_Norm_RSD = rsd_d7_propranolol_TIC$RSD
+)
+
+# Set the column names dynamically
+colnames(overview_table_pro) <- c("Batch", "No_norm", "TIC_norm")
+
+# Displaying RSD table
+display_rsd_table_pro_d7 <- kable(overview_table_pro, format = "html", row.names = FALSE) %>%
+  kable_styling(full_width = FALSE)
+
+# Add table name
+display_rsd_table_pro_d7 <- paste("<h2 style='text-align: center;'>Overview RSD Table Internal Standard</h2>", 
+                               as.character(display_rsd_table_pro_d7))
+
+cat("\033[1mOverview of RSD calculation for Internal Standard (No norm, TIC norm).\033[0m\n")
+# Save HTML table to a file
+display_html(display_rsd_table_pro_d7)
+cat("\033[1mNotice: IS_norm is not an analyte specific (IS norm = QCS / Internal Standard).\033[0m\n")
+```
+:::
+
+::: {#visualization .cell .markdown}
+## Visualization {#visualization_1}
+
+To see visualization of 3 datasets (no normalization, TIC normalization,
+IS normalization) we have 2 types of visualization: Intensity plot and
+Violin plot.
+
+You can drag each figures or screenshot them to save them. As well, in
+output section, these plots will be saved in result folder.
+
+1.  [Intensity Plot (Intensity vs Measurement Order)](#intensity_1)
+2.  [Violin Plot](#violin_1)
+3.  [VCA Plot](#vca_plot_1)
+:::
+
+::: {#intensity_plot .cell .markdown}
+## 1. Intensity Plot {#intensity_1}
+
+QCS analyte intensity plot over measurement order which was provided in
+the batch_info csv file. Each day/batch is denoted into different color
+while peak intensity is scaled by its mean. Intensity plot represents
+the QCS peak intensity detected in MALDI-MSI over the measurement order.
+The red dashed line will represent the mean of QCS peak intensity and
+the grey dashed line will represent the standard deviation of +- 1 of
+the mean (mean - std or mean + std).
+:::
+
+::: {#intensity_plot1 .cell .r}
+```{r}
+# Intensity Plot (Intensity vs Measurement Order) #
+
+# load libraries #
+library(RColorBrewer)
+library(ggplot2)
+
+# Functions #
+# extract only qcs
+extract_qcs_data <- function(dataset, sample_set) {
+  pattern <- paste(sample_set, collapse = "|")
+  
+  # Extract tissue rows
+  tissue_rows <- grep(pattern, rownames(dataset))
+  
+  # Subset dataframe to exclude tissue rows
+  qcs_data <- dataset[-tissue_rows, , drop = FALSE]
+  
+  return(qcs_data)
+}
+
+## No Normalization Dataset ##
+# get rid of tissue samples
+qcs_batch_info_data <- extract_qcs_data(combined_batch_info_data, sample_set_1)
+
+# ordering by batch then s_value
+qcs_batch_info_data_ordered <- qcs_batch_info_data[order(qcs_batch_info_data$batch), ]
+batch <- qcs_batch_info_data_ordered$batch
+
+# extract s_value
+row_names_qcs <- rownames(qcs_batch_info_data_ordered)
+s_values <- as.numeric(sub(".*S(\\d+).*", "\\1", row_names_qcs))
+
+qcs_batch_info_data_ordered$S <- s_values
+qcs_batch_info_data_ordered <- qcs_batch_info_data_ordered[order(qcs_batch_info_data_ordered$batch, qcs_batch_info_data_ordered$S), ]
+
+propranolol_intensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == QCS_mz_value_1, drop = FALSE]
+propranolol_intensity_values <- as.numeric(unlist(propranolol_intensity))
+propranolol_intensity <- scale(propranolol_intensity_values) ## scaling
+
+# intensity plot based on measurement_order
+qcs_batch_info_data_ordered$measurement_order <- seq_len(nrow(qcs_batch_info_data_ordered))
+
+plot_data_scaled <- data.frame(
+  Measurement_order = qcs_batch_info_data_ordered$measurement_order,
+  Batch = qcs_batch_info_data_ordered$batch,
+  Intensity = propranolol_intensity
+)
+
+mean_intensity <- mean(plot_data_scaled$Intensity)
+sd_intensity <- sd(plot_data_scaled$Intensity)
+batch_unique <- unique(plot_data_scaled$Batch)
+cat("\033[1mRed dotted line represents mean intensity (mean(scaled_intensity)). Black dotted lines represent standard deviation.(mean - std)\033[0m\n")
+
+# setting colors
+custom_colors <- c("1" = "red", "2" = "green", "3" = "blue") 
+
+# Get the unique batch numbers
+unique_batches <- unique(plot_data_scaled$Batch)
+
+# Check if there are more than 3 unique batches
+if (length(unique_batches) > 3) {
+  additional_batches <- setdiff(unique_batches, names(custom_colors))
+  # Generate additional colors using RColorBrewer palette
+  additional_colors <- brewer.pal(length(additional_batches), "Set3")
+  # Combine custom colors with additional colors
+  all_colors <- c(custom_colors, setNames(additional_colors, additional_batches))
+} else {
+  all_colors <- custom_colors
+}
+
+# Create the intensity plot
+options(repr.plot.width = 10, repr.plot.height = 6)  # Adjust width and height as desired
+intensity_plot <- ggplot(plot_data_scaled, aes(x = Measurement_order, y = Intensity, color = factor(Batch))) +
+  geom_point(size = 5) +  # Points colored by Batch
+  geom_line(aes(group = Batch), alpha = 0.5) +  # Lines grouped by Batch
+  geom_hline(yintercept = mean_intensity, linetype = "dotted", color = "red", linewidth = 1) +  # Red dotted line for mean
+  geom_hline(yintercept = mean_intensity + sd_intensity, linetype = "dotted", color = "black", linewidth = 1) +  # Black dotted line for mean + SD
+  geom_hline(yintercept = mean_intensity - sd_intensity, linetype = "dotted", color = "black", linewidth = 1) +  # Black dotted line for mean - SD
+  labs(x = "Measurement Order", y = "Scaled Intensity", color = "Batch") +  # Axis labels
+  scale_x_continuous(breaks = seq(5, max(plot_data_scaled$Measurement_order), by = 5)) +  # X-axis breaks
+  scale_color_manual(values = all_colors) +  # Color scale
+  ggtitle("No Normalization") +
+  theme(
+    plot.title = element_text(size = 40, hjust = 0.5, face = "bold"),  
+    axis.title.x = element_text(size = 25, face = "bold"), 
+    axis.title.y = element_text(size = 25, face = "bold"),  
+    axis.text.x = element_text(size = 15, face = "bold"), 
+    axis.text.y = element_text(size = 20, face = "bold")  
+  )
+print(intensity_plot)
+
+# TIC normalization Dataset #
+# get rid of tissue samples
+qcs_batch_info_data <- extract_qcs_data(combined_batch_info_data_TIC, sample_set_1)
+
+# ordering by batch then s value)
+qcs_batch_info_data_ordered <- qcs_batch_info_data[order(qcs_batch_info_data$batch), ]
+
+batch <- qcs_batch_info_data_ordered$batch
+row_names_qcs <- rownames(qcs_batch_info_data_ordered)
+s_values <- as.numeric(sub(".*S(\\d+).*", "\\1", row_names_qcs))
+
+qcs_batch_info_data_ordered$S <- s_values
+qcs_batch_info_data_ordered <- qcs_batch_info_data_ordered[order(qcs_batch_info_data_ordered$batch, qcs_batch_info_data_ordered$S), ]
+
+propranolol_intensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == QCS_mz_value_1, drop = FALSE]
+propranolol_intensity_values <- as.numeric(unlist(propranolol_intensity))
+propranolol_intensity <- scale(propranolol_intensity_values)
+
+# intensity plot based on measurement_order
+qcs_batch_info_data_ordered$measurement_order <- seq_len(nrow(qcs_batch_info_data_ordered))
+
+plot_data_scaled <- data.frame(
+  Measurement_order = qcs_batch_info_data_ordered$measurement_order,
+  Batch = qcs_batch_info_data_ordered$batch,
+  Intensity = propranolol_intensity
+)
+
+rownames(plot_data_scaled) <- rownames(qcs_batch_info_data_ordered)
+#print(plot_data_scaled)
+
+mean_intensity_TIC <- mean(plot_data_scaled$Intensity)
+sd_intensity <- sd(plot_data_scaled$Intensity)
+batch_unique <- unique(plot_data_scaled$Batch)
+
+# intensity plot
+options(repr.plot.width = 10, repr.plot.height = 6)  # Adjust width and height as desired
+intensity_plot_TIC <- ggplot(plot_data_scaled, aes(x = Measurement_order, y = Intensity, color = factor(Batch))) +
+  geom_point(size = 5) +  # Points colored by Batch
+  geom_line(aes(group = Batch), alpha = 0.5) +  # Lines grouped by Batch
+  geom_hline(yintercept = mean_intensity_TIC, linetype = "dotted", color = "red", linewidth = 1) +  # Red dotted line for mean
+  geom_hline(yintercept = mean_intensity_TIC + sd_intensity, linetype = "dotted", color = "black", linewidth = 1) +  # Black dotted line for mean + SD
+  geom_hline(yintercept = mean_intensity_TIC - sd_intensity, linetype = "dotted", color = "black", linewidth = 1) +  # Black dotted line for mean - SD
+  labs(x = "Measurement Order", y = "Scaled Intensity", color = "Batch") +  # Axis labels
+  scale_x_continuous(breaks = seq(5, max(plot_data_scaled$Measurement_order), by = 5)) +  # X-axis breaks
+  scale_color_manual(values = all_colors) +  # Color scale
+  ggtitle("TIC Normalization") +
+  theme(
+    plot.title = element_text(size = 40, hjust = 0.5, face = "bold"),  
+    axis.title.x = element_text(size = 25, face = "bold"),  
+    axis.title.y = element_text(size = 25, face = "bold"),  
+    axis.text.x = element_text(size = 15, face = "bold"),  
+    axis.text.y = element_text(size = 20, face = "bold")  
+  )
+print(intensity_plot_TIC)
+
+# IS normalization Dataset #
+# get rid of tissue samples and ordering by batch
+qcs_batch_info_data <- extract_qcs_data(combined_batch_info_data, sample_set_1)
+qcs_batch_info_data_ordered <- qcs_batch_info_data[order(qcs_batch_info_data$batch), ]
+
+# ordering by s-value
+row_names_qcs <- rownames(qcs_batch_info_data_ordered)
+s_values <- as.numeric(sub(".*S(\\d+).*", "\\1", row_names_qcs))
+
+qcs_batch_info_data_ordered$S <- s_values
+qcs_batch_info_data_ordered <- qcs_batch_info_data_ordered[order(qcs_batch_info_data_ordered$batch, qcs_batch_info_data_ordered$S), ]
+
+# assign measurement order
+qcs_batch_info_data_ordered$measurement_order <- seq_len(nrow(qcs_batch_info_data_ordered))
+batch <- qcs_batch_info_data_ordered$batch
+
+propranolol_intensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == QCS_mz_value_1, drop = FALSE] 
+propranolol_intensity_values <- as.numeric(unlist(propranolol_intensity))
+
+d7_propranolol_intensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == IS_mz_value_1, drop = FALSE] 
+d7_propranolol_intensity_values <- as.numeric(unlist(d7_propranolol_intensity))
+
+ratio_intensity <- propranolol_intensity_values / d7_propranolol_intensity_values
+ratio_intensity <- scale(ratio_intensity)
+
+# making data frame
+plot_data_scaled <- data.frame(
+  Measurement_order = qcs_batch_info_data_ordered$measurement_order,
+  Batch = qcs_batch_info_data_ordered$batch,
+  Intensity = ratio_intensity
+)
+mean_intensity_IS <- mean(plot_data_scaled$Intensity)
+sd_intensity <- sd(plot_data_scaled$Intensity)
+batch_unique <- unique(plot_data_scaled$Batch)
+
+# Create the intensity plot
+options(repr.plot.width = 10, repr.plot.height = 6)  # Adjust width and height as desired
+intensity_plot_IS <- ggplot(plot_data_scaled, aes(x = Measurement_order, y = Intensity, color = factor(Batch))) +
+  geom_point(size = 5) +  # Points colored by Batch
+  geom_line(aes(group = Batch), alpha = 0.5) +  # Lines grouped by Batch
+  geom_hline(yintercept = mean_intensity_IS, linetype = "dotted", color = "red", linewidth = 1) +  # Red dotted line for mean
+  geom_hline(yintercept = mean_intensity_IS + sd_intensity, linetype = "dotted", color = "black", linewidth = 1) +  # Black dotted line for mean + SD
+  geom_hline(yintercept = mean_intensity_IS - sd_intensity, linetype = "dotted", color = "black", linewidth = 1) +  # Black dotted line for mean - SD
+  labs(x = "Measurement Order", y = "Scaled Intensity", color = "Batch") +  # Axis labels
+  scale_x_continuous(breaks = seq(5, max(plot_data_scaled$Measurement_order), by = 5)) +  # X-axis breaks
+  scale_color_manual(values = all_colors) +  # Color scale
+  ggtitle("IS Normalization") +
+  theme(
+    plot.title = element_text(size = 40, hjust = 0.5, face = "bold"),  
+    axis.title.x = element_text(size = 25, face = "bold"),  
+    axis.title.y = element_text(size = 25, face = "bold"),  
+    axis.text.x = element_text(size = 15, face = "bold"),  
+    axis.text.y = element_text(size = 20, face = "bold")  
+  )
+print(intensity_plot_IS)
+```
+:::
+
+::: {#intensity_plot2 .cell .r}
+## Overview of Intensity Plot
+
+```{r}
+# Display combined
+library(gridExtra)
+options(repr.plot.width = 30, repr.plot.height = 8)  # Adjust width and height as desired
+combined_intensity_plot <- grid.arrange(intensity_plot, intensity_plot_TIC, intensity_plot_IS, ncol = 3)
+```
+:::
+
+::: {#violin_plot .cell .markdown}
+## 2. Violin Plot {#violin-plot}
+
+Violin plot represents the spreadout and variability of the QCS samples
+(both propranolol and D7_propranolol for example). It would have QCS
+peak intensity on the y-axis while each violins would represent each
+slide on the x-axis. It is scaled by its mean.
+:::
+
+::: {#violin_plot1 .cell .r}
+```{r}
+## Violin Plot ##
+# Load library
+library(ggplot2)
+library(dplyr)
+library(RColorBrewer)
+
+# Function to scale data by its mean
+scale_by_mean <- function(data_frame) {
+  mean_value <- mean(data_frame$Value)
+  sd_value <- sd(data_frame$Value)  
+  data_frame <- data_frame %>%
+    mutate(Value = (Value - mean_value) / sd_value) # Z-score normalization
+  return(data_frame)
+}
+
+# No Normalization Dataset #
+# Transform and prepare the dataset
+propranolol_data_trans <- as.data.frame(t(propranolol_data))
+propranolol_data_trans[] <- lapply(propranolol_data_trans, as.numeric)
+
+# Extract slide number
+slide_number <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans))
+slide_number <- as.numeric(slide_number)
+
+# Create violin plot data frame
+violin_data <- data.frame(
+  Slide = slide_number,
+  Batch = propranolol_data$batch,
+  Value = unlist(propranolol_data_trans[3, ])
+)
+
+# Scale No Normalization data by its mean
+violin_data <- scale_by_mean(violin_data)
+
+# TIC Normalization Dataset #
+# Transform and prepare the dataset
+propranolol_data_trans_TIC <- as.data.frame(t(propranolol_data_TIC))
+propranolol_data_trans_TIC[] <- lapply(propranolol_data_trans_TIC, as.numeric)
+
+# Extract slide number
+slide_number_TIC <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans_TIC))
+slide_number_TIC <- as.numeric(slide_number_TIC)
+
+# Create violin plot data frame
+violin_data_TIC <- data.frame(
+  Slide = slide_number_TIC,
+  Batch = propranolol_data$batch,
+  Value = unlist(propranolol_data_trans_TIC[3, ])
+)
+
+# Scale TIC Normalization data by its mean
+violin_data_TIC <- scale_by_mean(violin_data_TIC)
+
+# IS Normalization Dataset #
+# Transform and prepare the dataset
+propranolol_data_trans_IS <- as.data.frame(t(ratio_data))
+propranolol_data_trans_IS[] <- lapply(propranolol_data_trans_IS, as.numeric)
+
+# Extract slide number
+slide_number_IS <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans_IS))
+slide_number_IS <- as.numeric(slide_number_IS)
+
+# Create violin plot data frame
+violin_data_IS <- data.frame(
+  Slide = slide_number_IS,
+  Batch = ratio_data$batch,
+  Value = unlist(propranolol_data_trans_IS[3, ])
+)
+
+# Scale IS Normalization data by its mean
+violin_data_IS <- scale_by_mean(violin_data_IS)
+
+# Define the colors for the first three batches
+manual_colors <- c("1" = "red", "2" = "green", "3" = "blue")
+
+# Plot function to ensure consistent scaling
+plot_violin <- function(data, title) {
+  unique_batches <- unique(data$Batch)
+  additional_batches <- setdiff(unique_batches, names(manual_colors))
+  
+  if (length(additional_batches) > 0) {
+    additional_colors <- colorRampPalette(brewer.pal(9, "Set3"))(length(additional_batches))
+    additional_colors <- setNames(additional_colors, additional_batches)
+  } else {
+    additional_colors <- c()
+  }
+  
+  all_colors <- c(manual_colors, additional_colors)
+  
+  ggplot(data, aes(x = factor(Slide), y = Value, fill = factor(Batch))) +
+    geom_violin(position = position_dodge(width = 0.5), trim = FALSE, width = 1) +
+    stat_summary(fun = median, geom = "point", shape = 20, size = 3, color = "black") +
+    geom_point(position = position_jitter(width = 0.1), alpha = 0.5) + 
+    geom_hline(yintercept = 1, linetype = "dashed", color = "gray", linewidth = 1) +
+    scale_fill_manual(values = all_colors) +
+    labs(x = "Slide Number", y = "Scaled Peak Data", title = title) +
+    theme_bw() +
+    theme(
+
+      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, face = "bold", size = 25),
+      axis.text.y = element_text(angle = 90, vjust = 0.5, hjust = 1, face = "bold", size = 25),
+      axis.title = element_text(face = "bold", size = 25),  
+      plot.title = element_text(face = "bold", size = 35),  
+      axis.text = element_text(size = 20)
+    )
+}
+
+# Plot the data with each dataset scaled by its mean
+cat("\033[1mGray dotted line represents median\033[0m\n")
+options(repr.plot.width = 10, repr.plot.height = 6)
+
+# No Normalization Plot
+violin_plot_jit <- plot_violin(violin_data, "No Normalization (QCS)")
+print(violin_plot_jit)
+
+# TIC Normalization Plot
+violin_plot_TIC_jit <- plot_violin(violin_data_TIC, "TIC Normalization (QCS)")
+print(violin_plot_TIC_jit)
+
+# IS Normalization Plot
+violin_plot_IS_jit <- plot_violin(violin_data_IS, "IS Normalization (QCS)")
+print(violin_plot_IS_jit)
+```
+:::
+
+::: {#violin_plot2 .cell .r}
+```{r}
+## Violin Plot ##
+
+# Load library
+library(ggplot2)
+library(dplyr)
+library(RColorBrewer)
+
+# Function to scale data by its mean
+scale_by_mean <- function(data_frame) {
+  mean_value <- mean(data_frame$Value)
+  sd_value <- sd(data_frame$Value)  
+  data_frame <- data_frame %>%
+    mutate(Value = (Value - mean_value) / sd_value) # Z-score normalization
+  return(data_frame)
+}
+
+# No Normalization Dataset #
+# Transform and prepare the dataset
+propranolol_data_trans <- as.data.frame(t(d7_propranolol_data))
+propranolol_data_trans[] <- lapply(propranolol_data_trans, as.numeric)
+
+# Extract slide number
+slide_number <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans))
+slide_number <- as.numeric(slide_number)
+
+# Create violin plot data frame
+violin_data <- data.frame(
+  Slide = slide_number,
+  Batch = propranolol_data$batch,
+  Value = unlist(propranolol_data_trans[3, ])
+)
+
+# Scale No Normalization data by its mean
+violin_data <- scale_by_mean(violin_data)
+
+# Sort the data frame based on the Slide column
+violin_data <- violin_data %>%
+  arrange(Slide)
+
+# Define the colors for the first three batches
+manual_colors <- c("1" = "red", "2" = "green", "3" = "blue")
+
+# Get the unique batches in your data
+unique_batches <- unique(violin_data$Batch)
+
+# Determine the number of additional batches
+additional_batches <- setdiff(unique_batches, names(manual_colors))
+
+# Generate additional colors using a color ramp palette
+if (length(additional_batches) > 0) {
+  additional_colors <- colorRampPalette(brewer.pal(9, "Set3"))(length(additional_batches))
+  additional_colors <- setNames(additional_colors, additional_batches)
+} else {
+  additional_colors <- c()
+}
+
+# Combine the manually defined colors with the additional colors
+all_colors <- c(manual_colors, additional_colors)
+
+# Plot the No Normalization data
+cat("\033[1mGray dotted line represents median\033[0m\n")
+options(repr.plot.width = 10, repr.plot.height = 6)  # Adjust width and height as desired
+violin_plot_jit_d7 <- ggplot(violin_data, aes(x = factor(Slide), y = Value, fill = factor(Batch))) +
+  geom_violin(position = position_dodge(width = 0.5), trim = FALSE, width = 1) +
+  stat_summary(fun = median, geom = "point", shape = 20, size = 3, color = "black") +
+  geom_point(position = position_jitter(width = 0.1), alpha = 0.5) + 
+  geom_hline(yintercept = 1, linetype = "dashed", color = "gray", linewidth = 1) +
+  scale_fill_manual(values = all_colors) +
+  labs(x = "Slide Number", y = "Scaled Peak Data", title = "No Normalization (Internal Standard)") +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, face = "bold", size = 25),
+    axis.text.y = element_text(angle = 90, vjust = 0.5, hjust = 1, face = "bold", size = 25),
+    axis.title = element_text(face = "bold", size = 25),  
+    plot.title = element_text(face = "bold", size = 35),  
+    axis.text = element_text(size = 15)  
+  )
+print(violin_plot_jit_d7)
+
+# TIC Normalization Dataset #
+# Transform and prepare the dataset
+propranolol_data_trans_TIC <- as.data.frame(t(d7_propranolol_data_TIC))
+propranolol_data_trans_TIC[] <- lapply(propranolol_data_trans_TIC, as.numeric)
+
+# Extract slide number
+slide_number_TIC <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans_TIC))
+slide_number_TIC <- as.numeric(slide_number_TIC)
+
+# Create violin plot data frame
+violin_data_TIC <- data.frame(
+  Slide = slide_number_TIC,
+  Batch = propranolol_data$batch,
+  Value = unlist(propranolol_data_trans_TIC[3, ])
+)
+
+# Scale TIC Normalization data by its mean
+violin_data_TIC <- scale_by_mean(violin_data_TIC)
+
+# Sort the data frame based on the Slide column
+violin_data_TIC <- violin_data_TIC %>%
+  arrange(Slide)
+
+# Define the colors for the first three batches
+manual_colors <- c("1" = "red", "2" = "green", "3" = "blue")
+
+# Get the unique batches in your data
+unique_batches <- unique(violin_data_TIC$Batch)
+
+# Determine the number of additional batches
+additional_batches <- setdiff(unique_batches, names(manual_colors))
+
+# Generate additional colors using a color ramp palette
+if (length(additional_batches) > 0) {
+  additional_colors <- colorRampPalette(brewer.pal(9, "Set3"))(length(additional_batches))
+  additional_colors <- setNames(additional_colors, additional_batches)
+} else {
+  additional_colors <- c()
+}
+
+# Combine the manually defined colors with the additional colors
+all_colors <- c(manual_colors, additional_colors)
+
+# Plot the TIC normalization data
+options(repr.plot.width = 10, repr.plot.height = 6)  # Adjust width and height as desired
+violin_plot_TIC_jit_d7 <- ggplot(violin_data_TIC, aes(x = factor(Slide), y = Value, fill = factor(Batch))) +
+  geom_violin(position = position_dodge(width = 0.5), trim = FALSE, width = 1) +
+  stat_summary(fun = median, geom = "point", shape = 20, size = 3, color = "black") +
+  geom_point(position = position_jitter(width = 0.1), alpha = 0.5) + 
+  geom_hline(yintercept = 1, linetype = "dashed", color = "gray", linewidth = 1) +
+  scale_fill_manual(values = all_colors) +
+  labs(x = "Slide Number", y = "Scaled Peak Data", title = "TIC Normalization (Internal Standard)") +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, face = "bold", size = 25),
+    axis.text.y = element_text(angle = 90, vjust = 0.5, hjust = 1, face = "bold", size = 25),
+    axis.title = element_text(face = "bold", size = 25),  
+    plot.title = element_text(face = "bold", size = 35),  
+    axis.text = element_text(size = 15) 
+  )
+print(violin_plot_TIC_jit_d7)
+```
+:::
+
+::: {#violin_plot3 .cell .r}
+## Overview Violin Plot
+
+```{r}
+# Display Violin Plot (Propranolol)
+library(gridExtra)
+options(repr.plot.width = 30, repr.plot.height = 8)  # Adjust width and height as desired
+combined_violin_plot <- grid.arrange(violin_plot_jit, violin_plot_TIC_jit, violin_plot_IS_jit, ncol = 3)
+```
+:::
+
+::: {#violin_plot4 .cell .r}
+```{r}
+# Display Violin Plot (D7_Propranolol)
+library(gridExtra)
+options(repr.plot.width = 30, repr.plot.height = 8)  # Adjust width and height as desired
+combined_violin_plot_d7 <- grid.arrange(violin_plot_jit_d7, violin_plot_TIC_jit_d7, ncol = 3)
+```
+:::
+
+::: {#vca_plot0m .cell .markdown}
+## \## 3. VCA Plot
+
+<a id="vca_plot_1"></a>
+
+Variability Chart for Analysis (VCA) plot is used in variance component
+anaysis to visualze the variability of a dependent variable (QCS and IS
+peak data) across the different levels of batch (row, slide, day).
+:::
+
+::: {#vca_plot1 .cell .r}
+```{r}
+## VCA Plot ##
+# QCS #
+
+library(VCA)
+## Adding row, slide, day columns and ordering function ##
+add_day_slide_row <- function(data) {
+  # Extract slide numbers from rownames
+  slide_numbers <- as.numeric(sub(".*S(\\d+)_.*", "\\1", rownames(data)))
+  
+  # Add the 'slide' column
+  data$slide <- slide_numbers
+  
+  # Add the 'day' column based on slide ranges
+  data$day <- ifelse(slide_numbers >= 1 & slide_numbers <= 6, 1,
+                     ifelse(slide_numbers >= 7 & slide_numbers <= 12, 2,
+                            ifelse(slide_numbers >= 13 & slide_numbers <= 18, 3, NA)))
+  
+  # Add the 'row' column based on QCS ranges
+  data$row <- ifelse(
+    as.numeric(sub(".*QCS_(\\d+).*", "\\1", rownames(data))) <= 3, 
+    1, 
+    2
+  )
+  
+  # Order the data by slide_numbers
+  data <- data[order(slide_numbers), ]
+  
+  # Return the modified and ordered dataset
+  return(data)
+}
+
+# Define the function to process and plot the VCA data
+plot_vca_data <- function(data, qcs_mz_value, is_mz_value, plot_title) {
+  data <- add_day_slide_row(data)
+  
+  # Replacing column name values with QCS/IS for subsetting
+  colnames(data)[colnames(data) == as.character(qcs_mz_value)] <- "QCS"
+  colnames(data)[colnames(data) == as.character(is_mz_value)] <- "IS"
+   
+  # QCS data processing
+  plot_data <- data %>%
+    as.data.frame() %>%
+    select(c("injection.order", "batch", "QCS", "row", "slide", "day")) %>%
+    mutate(scale = scale(QCS))  # Scaling QCS column
+  
+  # VCA plotting
+  varPlot(form = scale ~ day/slide/row, 
+          Data = plot_data,
+          YLabel = list(text = "Raw peak area, scaling", side = 2, line = 2, cex = 1),
+          MeanLine = list(var = c("int", "slide", "day"), 
+                          col = c("white", "blue", "magenta"), lwd = c(2, 2, 2)), 
+          BG = list(var = "day", col = paste0("gray", c(70, 80, 90))))
+  
+  # Adding plot title
+  title(main = plot_title)
+}
+
+# VCA plots of no norm and TIC norm
+no_normalization_vca <- plot_vca_data(propranolol_data, QCS_mz_value_1, IS_mz_value_1, "No Normalization Dataset (QCS)")
+TIC_normalization_vca <- plot_vca_data(propranolol_data_TIC, QCS_mz_value_1, IS_mz_value_1, "TIC Normalization Dataset (QCS)")
+
+# VCA Plot for Internal Standard Normalization #
+# IS Dataset Upload
+rawdata <- read.csv("Dataset/formatted_IS_norm_batch_data.csv",
+                    row.names = 1,
+                    check.names = FALSE
+) 
+qcs_batch_info_data <- rawdata 
+
+# get rid of x infront of values
+colnames(qcs_batch_info_data)
+rownames(qcs_batch_info_data) 
+
+# transpose
+propranolol_data_IS <- as.data.frame(t(qcs_batch_info_data))
+colnames(propranolol_data_IS) <- rownames(qcs_batch_info_data)
+rownames(propranolol_data_IS) <- colnames(qcs_batch_info_data) 
+
+propranolol_data_IS <- add_day_slide_row(propranolol_data_IS)
+
+data(VCAdata1)
+datS5 <- subset(VCAdata1, sample==5)
+varPlot(form=y~(device+lot)/day/run, Data=datS5)
+
+# QCS
+IS_normalization_vca <- propranolol_data_IS %>%
+  as.data.frame() %>%
+  select(c("injection.order", "batch", "ratio", "row", "slide", "day")) %>%
+  mutate(scale = scale(ratio)) # Scaling ratio column
+
+varPlot(form = scale ~ day/slide/row, 
+        Data = plot,
+        YLabel = list(text = "Raw peak area, scaling", side = 2, line = 2, cex = 1),
+        MeanLine = list(var = c("int", "slide", "day"), 
+                        col = c("white", "blue", "magenta"), lwd = c(2, 2, 2)), 
+        BG = list(var = "day", col = paste0("gray", c(70, 80, 90))))
+
+# Adding Title
+title(main = "IS Normalization Dataset")
+```
+:::
+
+::: {#vca_plot2 .cell .r}
+```{r}
+## VCA Plot ##
+# Internal Standard #
+
+library(VCA)
+## Adding row, slide, day columns and ordering function ##
+add_day_slide_row <- function(data) {
+  # Extract slide numbers from rownames
+  slide_numbers <- as.numeric(sub(".*S(\\d+)_.*", "\\1", rownames(data)))
+  
+  # Add the 'slide' column
+  data$slide <- slide_numbers
+  
+  # Add the 'day' column based on slide ranges
+  data$day <- ifelse(slide_numbers >= 1 & slide_numbers <= 6, 1,
+                     ifelse(slide_numbers >= 7 & slide_numbers <= 12, 2,
+                            ifelse(slide_numbers >= 13 & slide_numbers <= 18, 3, NA)))
+  
+  # Add the 'row' column based on QCS ranges
+  data$row <- ifelse(
+    as.numeric(sub(".*QCS_(\\d+).*", "\\1", rownames(data))) <= 3, 
+    1, 
+    2
+  )
+  
+  # Order the data by slide_numbers
+  data <- data[order(slide_numbers), ]
+  
+  # Return the modified and ordered dataset
+  return(data)
+}
+
+# Define the function to process and plot the VCA data
+plot_vca_data <- function(data, qcs_mz_value, is_mz_value, plot_title) {
+  data <- add_day_slide_row(data)
+  
+  # Replacing column name values with QCS/IS for subsetting
+  colnames(data)[colnames(data) == as.character(qcs_mz_value)] <- "QCS"
+  colnames(data)[colnames(data) == as.character(is_mz_value)] <- "IS"
+   
+  # IS data processing
+  plot_data <- data %>%
+    as.data.frame() %>%
+    select(c("injection.order", "batch", "IS", "row", "slide", "day")) %>%
+    mutate(scale = scale(QCS))  # Scaling IS column
+  
+  # VCA plotting
+  varPlot(form = scale ~ day/slide/row, 
+          Data = plot_data,
+          YLabel = list(text = "Raw peak area, scaling", side = 2, line = 2, cex = 1),
+          MeanLine = list(var = c("int", "slide", "day"), 
+                          col = c("white", "blue", "magenta"), lwd = c(2, 2, 2)), 
+          BG = list(var = "day", col = paste0("gray", c(70, 80, 90))))
+  
+  # Adding plot title
+  title(main = plot_title)
+}
+
+# VCA plots of no norm and TIC norm
+no_normalization_vca_IS <- plot_vca_data(d7_propranolol_data, QCS_mz_value_1, IS_mz_value_1, "No Normalization Dataset (IS)")
+TIC_normalization_vca_IS <- plot_vca_data(d7_propranolol_data_TIC, QCS_mz_value_1, IS_mz_value_1, "TIC Normalization Dataset (IS)")
+```
+:::
+
+::: {#vca_plot3 .cell .r}
+```{r}
+# Display VCA Plot (QCS)
+library(gridExtra)
+options(repr.plot.width = 30, repr.plot.height = 8)  # Adjust width and height as desired
+combined_vca_plot <- grid.arrange(no_normalization_vca, TIC_normalization_vca, IS_normalization_vca, ncol = 3)
+```
+:::
+
+::: {#vca_plot4 .cell .r}
+```{r}
+# Display VCA Plot (Internal Standard)
+library(gridExtra)
+options(repr.plot.width = 30, repr.plot.height = 8)  # Adjust width and height as desired
+combined_vca_plot_IS <- grid.arrange(no_normalization_vca_IS, TIC_normalization_vca_IS, ncol = 3)
+```
+:::
+
+::: {#output .cell .markdown}
+## Output
+
+1.  3 Datasets as csv file (No norm, TIC norm, IS norm) in <b>Dataset
+    folder</b>
+2.  Excel sheets (No norm, TIC norm, IS norm) in <b>Excel folder</b>
+3.  Overview of Results in <b>Output folder</b>
+:::
+
+::: {#excel_sheet .cell .markdown}
+## Generate Excel sheets of each dataset in Intraday and Interday
+
+You can open the excel sheets by left clicking the file in output and
+select "open in new browser tab", then you can see the excel sheet is
+downloaded. It will ask you do put number of batches. (In our example,
+we conducted 3-day MALDI-MSI experiment thus we put 3 and it would
+produce Intraday 1, Intraday 2, Intraday 3, and Interday RSD.)
+:::
+
+::: {#excel_sheet1 .cell .r}
+```{r}
+library(openxlsx)
+
+# Prompt the user to input the number of batches
+num_batches <- as.integer(readline("Enter the number of batches in your dataset: "))
+
+create_batch_dataset_excel <- function(data, num_batches, propranolol_mz_value, file_name) {
+  library(openxlsx)
+  
+  # Create a new Excel workbook
+  wb <- createWorkbook()
+  
+  # Add sheets for Dataset, Intraday, and Interday
+  sheet_names <- c("Dataset", paste0("Intraday ", 1:num_batches), "Interday")
+  for (sheet_name in sheet_names) {
+    addWorksheet(wb, sheet_name)
+  }
+  
+  # Function to extract dataset for a specific batch
+  extract_batch_dataset <- function(data, batch_number) {
+    subset(data, batch == batch_number)
+  }
+  
+  # Loop through each batch and write data to corresponding sheets
+  for (i in 1:num_batches) {
+    batch_dataset <- extract_batch_dataset(data, i)
+    colnames(batch_dataset) <- sub("^X", "", colnames(batch_dataset))
+    numeric_batch_dataset <- as.numeric(batch_dataset[, colnames(batch_dataset) == propranolol_mz_value, drop = TRUE])
+    
+    intraday_rsd <- calculate_rsd(numeric_batch_dataset)
+    batch_dataset$intraday_rsd <- intraday_rsd
+    batch_dataset <- as.data.frame(batch_dataset)
+    
+    # Write data to Intraday sheet
+    writeData(wb, sheet = paste0("Intraday ", i), x = batch_dataset, rowNames = TRUE, colNames = TRUE)
+  }
+  
+  # Calculate Interday RSD for all data
+  numeric_interday_dataset <- as.numeric(data[, colnames(data) == propranolol_mz_value, drop = TRUE])
+  interday_rsd <- calculate_rsd(numeric_interday_dataset)
+  data$interday_rsd <- interday_rsd
+  
+  # Write data to Dataset and Interday sheets
+  writeData(wb, sheet = "Dataset", x = data, rowNames = TRUE, colNames = TRUE)
+  writeData(wb, sheet = "Interday", x = data, rowNames = TRUE, colNames = TRUE)
+  
+  # Save the workbook to a file, overwriting if it already exists
+  file_path <- paste0("Excel/", file_name, ".xlsx")
+  saveWorkbook(wb, file_path, overwrite = TRUE)
+  
+  return(file_path)
+}
+
+# Example usage:
+if (exists("propranolol_data") && length(propranolol_data) > 0) {
+    create_batch_dataset_excel(propranolol_data, num_batches, QCS_mz_value_1, "NO_Norm_QCS_batch_dataset_excel")
+}
+if (exists("propranolol_data_TIC") && length(propranolol_data_TIC) > 0) {
+    create_batch_dataset_excel(propranolol_data_TIC, num_batches, QCS_mz_value_1, "TIC_Norm_QCS_batch_dataset_excel")
+}
+if (exists("ratio_data") && length(ratio_data) > 0) {
+    create_batch_dataset_excel(ratio_data, num_batches, "ratio", "IS_Norm_QCS_batch_dataset_excel")
+}
+```
+:::
+
+::: {.output .display_data}
+'Excel/NO_Norm_QCS_batch_dataset_excel.xlsx'
+:::
+
+::: {.output .display_data}
+'Excel/TIC_Norm_QCS_batch_dataset_excel.xlsx'
+:::
+
+::: {.output .display_data}
+'Excel/IS_Norm_QCS_batch_dataset_excel.xlsx'
+:::
+
+::: {#overview_results .cell .markdown}
+## Overview of Results
+:::
+
+::: {#results1 .cell .r}
+```{r}
+library(gridExtra)
+options(repr.plot.width = 30, repr.plot.height = 20) 
+overview_plots <- grid.arrange(combined_intensity_plot, combined_violin_plot, combined_violin_plot_d7, combined_vca_plot, combined_vca_plot_IS, ncol = 1)
+display_html(display_rsd_table_pro)
+display_html(display_rsd_table_pro_d7)
+```
+:::
+
+::: {#results2 .output .display_data}
+```{=html}
+<h2 style='text-align: center;'>Overview RSD Table QCS</h2> <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Batch </th>
+   <th style="text-align:left;"> No_norm </th>
+   <th style="text-align:left;"> TIC_norm </th>
+   <th style="text-align:left;"> IS_norm </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Intraday 1 </td>
+   <td style="text-align:left;"> 70.5% </td>
+   <td style="text-align:left;"> 63.511% </td>
+   <td style="text-align:left;"> 10.475% </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Intraday 2 </td>
+   <td style="text-align:left;"> 41.414% </td>
+   <td style="text-align:left;"> 38.884% </td>
+   <td style="text-align:left;"> 13.597% </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Intraday 3 </td>
+   <td style="text-align:left;"> 34.072% </td>
+   <td style="text-align:left;"> 36.26% </td>
+   <td style="text-align:left;"> 17.122% </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Interday </td>
+   <td style="text-align:left;"> 52.048% </td>
+   <td style="text-align:left;"> 50.685% </td>
+   <td style="text-align:left;"> 14.11% </td>
+  </tr>
+</tbody>
+</table>
+```
+:::
+
+::: {.output .display_data}
+```{=html}
+<h2 style='text-align: center;'>Overview RSD Table Internal Standard</h2> <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Batch </th>
+   <th style="text-align:left;"> No_norm </th>
+   <th style="text-align:left;"> TIC_norm </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Intraday 1 </td>
+   <td style="text-align:left;"> 73.808% </td>
+   <td style="text-align:left;"> 66.959% </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Intraday 2 </td>
+   <td style="text-align:left;"> 39.711% </td>
+   <td style="text-align:left;"> 38.576% </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Intraday 3 </td>
+   <td style="text-align:left;"> 35.566% </td>
+   <td style="text-align:left;"> 36.631% </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Interday </td>
+   <td style="text-align:left;"> 53.147% </td>
+   <td style="text-align:left;"> 53.139% </td>
+  </tr>
+</tbody>
+</table>
+```
+:::
+
+::: {.output .display_data}
+![](vertopal_20fe299090dc4c09b975252af89eaaf2/3589b1948b2860001b81a0e8bc0ce6316fab2d6d.png){height="1200"
+width="1800"}
+:::
+::::::::::::::::::::::::::::::::::::
+
+::: {#ea424496-c410-44ea-8b04-f88063a0c5a6 .cell .markdown}
+## Saving the HTML tables and PNG plots
+:::
+
+::: {#fc8c7a8d-a5f9-4636-9865-73713989265e .cell .code execution_count="87" vscode="{\"languageId\":\"r\"}"}
+``` r
+library(kableExtra)
+library(htmltools)
+library(IRdisplay)
+
+# Function to save the HTML table to a file
+save_html_table <- function(html_content, file_path) {
+  # Create a full HTML document with the necessary CSS and HTML structure
+  html_document <- tags$html(
+    tags$head(
+      tags$meta(charset = "UTF-8"),
+      tags$title("RSD Table"),
+      tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/kableExtra/1.3.4/kableExtra.min.css"),
+      tags$style(
+        HTML(
+          ".kable-table { width: auto !important; margin-left: auto !important; margin-right: auto !important; }
+           table, th, td { border: 1px solid black; border-collapse: collapse; }
+           th, td { padding: 5px; text-align: left; }"
+        )
+      )
+    ),
+    tags$body(
+      HTML(html_content)
+    )
+  )
+  
+  # Write the full HTML document to the specified file path
+  save_html(html_document, file = file_path)
+}
+
+# Saves each result in the result folder
+if (!dir.exists("Output")) {
+  dir.create("Output")
+}
+
+# Save the RSD table to a file
+save_html_table(display_rsd_table_pro, "Output/propranolol_rsd.html")
+save_html_table(display_rsd_table_pro_d7, "Output/d7_propranolol_rsd.html")
+
+# Saving the intensity plot to a file
+file_path <- "Output/intensity_plots.png"
+ggsave(file_path, plot = combined_intensity_plot, width = 40, height = 10, dpi = 300)
+
+# Saving the violin plot QCS to a file
+file_path <- "Output/violin_QCS_plots.png"
+ggsave(file_path, plot = combined_violin_plot, width = 40, height = 10, dpi = 300)
+
+# Saving the violin plot Internal Standard to a file
+file_path <- "Output/violin_IS_plots.png"
+ggsave(file_path, plot = combined_violin_plot_d7, width = 40, height = 10, dpi = 300)
+
+# Saving the VCA plot QCS to a file
+file_path <- "Output/vca_QCS_plots.png"
+ggsave(file_path, plot = combined_vca_plot, width = 40, height = 10, dpi = 300)
+
+# Saving the VCA plot QCS to a file
+file_path <- "Output/vca_IS_plots.png"
+ggsave(file_path, plot = combined_vca_plot_IS, width = 40, height = 10, dpi = 300)
+```
+:::
+
+::::: {#ff251986-c629-4dce-8196-848dddf0175a .cell .code execution_count="89" vscode="{\"languageId\":\"r\"}"}
+``` r
+# Saving PNG Plots into one PDF file
+library(grid)
+library(png)
+
+# List all PNG files in the output folder
+png_files <- list.files("Output", pattern = "\\.png$", full.names = TRUE)
+
+# Read each PNG file into a list of rasterGrob objects
+plots <- lapply(png_files, function(file) {
+  png_plot <- png::readPNG(file)
+  grid::rasterGrob(png_plot, interpolate = TRUE)
+})
+
+# Create a PDF file with each plot on a separate page
+pdf("Output/PNG_plots.pdf", width = 11, height = 8.5)  # Adjust width and height as needed
+
+for (plot in plots) {
+  grid.newpage()  # Start a new page
+  grid.draw(plot)  # Draw the plot
+}
+
+dev.off()
+
+cat("All png plots saved to separate pages within a single PDF file in the Output file.")
+```
+
+::: {.output .display_data}
+**pdf:** 2
+:::
+
+::: {.output .stream .stdout}
+```         
+All png plots saved to separate pages within a single PDF file in the Output file.
+```
+:::
+:::::
+
+::: :::::::::::::::::::::::::::::::::::::::::
+:::
+
+::: ::::::::::::::::::::::::::::::::::::::::
+:::
+
+::::::::::::::::::::::::::::::::::::::::::
