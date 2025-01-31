@@ -215,7 +215,7 @@ are exported from SCiLS Lab MVS 2024b Premium 3D. IS normalization
 dataset is calculated in the pipeline.
 :::
 
-:::::::::::::::::::::::::::::::::::: {#no_norm .cell .markdown}
+::::::::::::::::::::::::: {#no_norm .cell .markdown}
 ## No Normalization Dataset
 
 ```{r}
@@ -576,31 +576,18 @@ print(overview_table_pro)
 ::: {#rsd_overview2 .cell .r}
 ```{r}
 library(kableExtra)
-library(htmltools)
 library(IRdisplay)
 
 # Dynamically create the overview table
-overview_table_pro <- data.frame(
+overview_table_IS <- data.frame(
   Row_Names = rsd_d7_propranolol$Batch,
   No_Norm_RSD = rsd_d7_propranolol$RSD,
   TIC_Norm_RSD = rsd_d7_propranolol_TIC$RSD
 )
 
 # Set the column names dynamically
-colnames(overview_table_pro) <- c("Batch", "No_norm", "TIC_norm")
-
-# Displaying RSD table
-display_rsd_table_pro_d7 <- kable(overview_table_pro, format = "html", row.names = FALSE) %>%
-  kable_styling(full_width = FALSE)
-
-# Add table name
-display_rsd_table_pro_d7 <- paste("<h2 style='text-align: center;'>Overview RSD Table Internal Standard</h2>", 
-                               as.character(display_rsd_table_pro_d7))
-
-cat("\033[1mOverview of RSD calculation for Internal Standard (No norm, TIC norm).\033[0m\n")
-# Save HTML table to a file
-display_html(display_rsd_table_pro_d7)
-cat("\033[1mNotice: IS_norm is not an analyte specific (IS norm = QCS / Internal Standard).\033[0m\n")
+colnames(overview_table_IS) <- c("Batch", "No_norm", "TIC_norm")
+print(overview_table_IS)
 ```
 :::
 
@@ -616,7 +603,6 @@ output section, these plots will be saved in result folder.
 
 1.  [Intensity Plot (Intensity vs Measurement Order)](#intensity_1)
 2.  [Violin Plot](#violin_1)
-3.  [VCA Plot](#vca_plot_1)
 :::
 
 ::: {#intensity_plot .cell .markdown}
@@ -843,8 +829,7 @@ print(intensity_plot_IS)
 ```{r}
 # Display combined
 library(gridExtra)
-options(repr.plot.width = 30, repr.plot.height = 8)  # Adjust width and height as desired
-combined_intensity_plot <- grid.arrange(intensity_plot, intensity_plot_TIC, intensity_plot_IS, ncol = 3)
+combined_intensity_plot <- grid.arrange(intensity_plot, intensity_plot_TIC, intensity_plot_IS)
 ```
 :::
 
@@ -1135,8 +1120,7 @@ print(violin_plot_TIC_jit_d7)
 ```{r}
 # Display Violin Plot (Propranolol)
 library(gridExtra)
-options(repr.plot.width = 30, repr.plot.height = 8)  # Adjust width and height as desired
-combined_violin_plot <- grid.arrange(violin_plot_jit, violin_plot_TIC_jit, violin_plot_IS_jit, ncol = 3)
+combined_violin_plot <- grid.arrange(violin_plot_jit, violin_plot_TIC_jit, violin_plot_IS_jit, ncol=2)
 ```
 :::
 
@@ -1144,205 +1128,7 @@ combined_violin_plot <- grid.arrange(violin_plot_jit, violin_plot_TIC_jit, violi
 ```{r}
 # Display Violin Plot (D7_Propranolol)
 library(gridExtra)
-options(repr.plot.width = 30, repr.plot.height = 8)  # Adjust width and height as desired
-combined_violin_plot_d7 <- grid.arrange(violin_plot_jit_d7, violin_plot_TIC_jit_d7, ncol = 3)
-```
-:::
-
-::: {#vca_plot0m .cell .markdown}
-## \## 3. VCA Plot
-
-<a id="vca_plot_1"></a>
-
-Variability Chart for Analysis (VCA) plot is used in variance component
-anaysis to visualze the variability of a dependent variable (QCS and IS
-peak data) across the different levels of batch (row, slide, day).
-:::
-
-::: {#vca_plot1 .cell .r}
-```{r}
-## VCA Plot ##
-# QCS #
-
-library(VCA)
-## Adding row, slide, day columns and ordering function ##
-add_day_slide_row <- function(data) {
-  # Extract slide numbers from rownames
-  slide_numbers <- as.numeric(sub(".*S(\\d+)_.*", "\\1", rownames(data)))
-  
-  # Add the 'slide' column
-  data$slide <- slide_numbers
-  
-  # Add the 'day' column based on slide ranges
-  data$day <- ifelse(slide_numbers >= 1 & slide_numbers <= 6, 1,
-                     ifelse(slide_numbers >= 7 & slide_numbers <= 12, 2,
-                            ifelse(slide_numbers >= 13 & slide_numbers <= 18, 3, NA)))
-  
-  # Add the 'row' column based on QCS ranges
-  data$row <- ifelse(
-    as.numeric(sub(".*QCS_(\\d+).*", "\\1", rownames(data))) <= 3, 
-    1, 
-    2
-  )
-  
-  # Order the data by slide_numbers
-  data <- data[order(slide_numbers), ]
-  
-  # Return the modified and ordered dataset
-  return(data)
-}
-
-# Define the function to process and plot the VCA data
-plot_vca_data <- function(data, qcs_mz_value, is_mz_value, plot_title) {
-  data <- add_day_slide_row(data)
-  
-  # Replacing column name values with QCS/IS for subsetting
-  colnames(data)[colnames(data) == as.character(qcs_mz_value)] <- "QCS"
-  colnames(data)[colnames(data) == as.character(is_mz_value)] <- "IS"
-   
-  # QCS data processing
-  plot_data <- data %>%
-    as.data.frame() %>%
-    select(c("injection.order", "batch", "QCS", "row", "slide", "day")) %>%
-    mutate(scale = scale(QCS))  # Scaling QCS column
-  
-  # VCA plotting
-  varPlot(form = scale ~ day/slide/row, 
-          Data = plot_data,
-          YLabel = list(text = "Raw peak area, scaling", side = 2, line = 2, cex = 1),
-          MeanLine = list(var = c("int", "slide", "day"), 
-                          col = c("white", "blue", "magenta"), lwd = c(2, 2, 2)), 
-          BG = list(var = "day", col = paste0("gray", c(70, 80, 90))))
-  
-  # Adding plot title
-  title(main = plot_title)
-}
-
-# VCA plots of no norm and TIC norm
-no_normalization_vca <- plot_vca_data(propranolol_data, QCS_mz_value_1, IS_mz_value_1, "No Normalization Dataset (QCS)")
-TIC_normalization_vca <- plot_vca_data(propranolol_data_TIC, QCS_mz_value_1, IS_mz_value_1, "TIC Normalization Dataset (QCS)")
-
-# VCA Plot for Internal Standard Normalization #
-# IS Dataset Upload
-rawdata <- read.csv("Dataset/formatted_IS_norm_batch_data.csv",
-                    row.names = 1,
-                    check.names = FALSE
-) 
-qcs_batch_info_data <- rawdata 
-
-# get rid of x infront of values
-colnames(qcs_batch_info_data)
-rownames(qcs_batch_info_data) 
-
-# transpose
-propranolol_data_IS <- as.data.frame(t(qcs_batch_info_data))
-colnames(propranolol_data_IS) <- rownames(qcs_batch_info_data)
-rownames(propranolol_data_IS) <- colnames(qcs_batch_info_data) 
-
-propranolol_data_IS <- add_day_slide_row(propranolol_data_IS)
-
-data(VCAdata1)
-datS5 <- subset(VCAdata1, sample==5)
-varPlot(form=y~(device+lot)/day/run, Data=datS5)
-
-# QCS
-IS_normalization_vca <- propranolol_data_IS %>%
-  as.data.frame() %>%
-  select(c("injection.order", "batch", "ratio", "row", "slide", "day")) %>%
-  mutate(scale = scale(ratio)) # Scaling ratio column
-
-varPlot(form = scale ~ day/slide/row, 
-        Data = plot,
-        YLabel = list(text = "Raw peak area, scaling", side = 2, line = 2, cex = 1),
-        MeanLine = list(var = c("int", "slide", "day"), 
-                        col = c("white", "blue", "magenta"), lwd = c(2, 2, 2)), 
-        BG = list(var = "day", col = paste0("gray", c(70, 80, 90))))
-
-# Adding Title
-title(main = "IS Normalization Dataset")
-```
-:::
-
-::: {#vca_plot2 .cell .r}
-```{r}
-## VCA Plot ##
-# Internal Standard #
-
-library(VCA)
-## Adding row, slide, day columns and ordering function ##
-add_day_slide_row <- function(data) {
-  # Extract slide numbers from rownames
-  slide_numbers <- as.numeric(sub(".*S(\\d+)_.*", "\\1", rownames(data)))
-  
-  # Add the 'slide' column
-  data$slide <- slide_numbers
-  
-  # Add the 'day' column based on slide ranges
-  data$day <- ifelse(slide_numbers >= 1 & slide_numbers <= 6, 1,
-                     ifelse(slide_numbers >= 7 & slide_numbers <= 12, 2,
-                            ifelse(slide_numbers >= 13 & slide_numbers <= 18, 3, NA)))
-  
-  # Add the 'row' column based on QCS ranges
-  data$row <- ifelse(
-    as.numeric(sub(".*QCS_(\\d+).*", "\\1", rownames(data))) <= 3, 
-    1, 
-    2
-  )
-  
-  # Order the data by slide_numbers
-  data <- data[order(slide_numbers), ]
-  
-  # Return the modified and ordered dataset
-  return(data)
-}
-
-# Define the function to process and plot the VCA data
-plot_vca_data <- function(data, qcs_mz_value, is_mz_value, plot_title) {
-  data <- add_day_slide_row(data)
-  
-  # Replacing column name values with QCS/IS for subsetting
-  colnames(data)[colnames(data) == as.character(qcs_mz_value)] <- "QCS"
-  colnames(data)[colnames(data) == as.character(is_mz_value)] <- "IS"
-   
-  # IS data processing
-  plot_data <- data %>%
-    as.data.frame() %>%
-    select(c("injection.order", "batch", "IS", "row", "slide", "day")) %>%
-    mutate(scale = scale(QCS))  # Scaling IS column
-  
-  # VCA plotting
-  varPlot(form = scale ~ day/slide/row, 
-          Data = plot_data,
-          YLabel = list(text = "Raw peak area, scaling", side = 2, line = 2, cex = 1),
-          MeanLine = list(var = c("int", "slide", "day"), 
-                          col = c("white", "blue", "magenta"), lwd = c(2, 2, 2)), 
-          BG = list(var = "day", col = paste0("gray", c(70, 80, 90))))
-  
-  # Adding plot title
-  title(main = plot_title)
-}
-
-# VCA plots of no norm and TIC norm
-no_normalization_vca_IS <- plot_vca_data(d7_propranolol_data, QCS_mz_value_1, IS_mz_value_1, "No Normalization Dataset (IS)")
-TIC_normalization_vca_IS <- plot_vca_data(d7_propranolol_data_TIC, QCS_mz_value_1, IS_mz_value_1, "TIC Normalization Dataset (IS)")
-```
-:::
-
-::: {#vca_plot3 .cell .r}
-```{r}
-# Display VCA Plot (QCS)
-library(gridExtra)
-options(repr.plot.width = 30, repr.plot.height = 8)  # Adjust width and height as desired
-combined_vca_plot <- grid.arrange(no_normalization_vca, TIC_normalization_vca, IS_normalization_vca, ncol = 3)
-```
-:::
-
-::: {#vca_plot4 .cell .r}
-```{r}
-# Display VCA Plot (Internal Standard)
-library(gridExtra)
-options(repr.plot.width = 30, repr.plot.height = 8)  # Adjust width and height as desired
-combined_vca_plot_IS <- grid.arrange(no_normalization_vca_IS, TIC_normalization_vca_IS, ncol = 3)
+combined_violin_plot_d7 <- grid.arrange(violin_plot_jit_d7, violin_plot_TIC_jit_d7, ncol=2)
 ```
 :::
 
@@ -1432,18 +1218,6 @@ if (exists("ratio_data") && length(ratio_data) > 0) {
 ```
 :::
 
-::: {.output .display_data}
-'Excel/NO_Norm_QCS_batch_dataset_excel.xlsx'
-:::
-
-::: {.output .display_data}
-'Excel/TIC_Norm_QCS_batch_dataset_excel.xlsx'
-:::
-
-::: {.output .display_data}
-'Excel/IS_Norm_QCS_batch_dataset_excel.xlsx'
-:::
-
 ::: {#overview_results .cell .markdown}
 ## Overview of Results
 :::
@@ -1451,205 +1225,9 @@ if (exists("ratio_data") && length(ratio_data) > 0) {
 ::: {#results1 .cell .r}
 ```{r}
 library(gridExtra)
-options(repr.plot.width = 30, repr.plot.height = 20) 
-overview_plots <- grid.arrange(combined_intensity_plot, combined_violin_plot, combined_violin_plot_d7, combined_vca_plot, combined_vca_plot_IS, ncol = 1)
-display_html(display_rsd_table_pro)
-display_html(display_rsd_table_pro_d7)
+# overview_plots <- grid.arrange(combined_intensity_plot, combined_violin_plot, combined_violin_plot_d7)
+print(overview_table_pro)
+print(overview_table_IS)
 ```
 :::
-
-::: {#results2 .output .display_data}
-```{=html}
-<h2 style='text-align: center;'>Overview RSD Table QCS</h2> <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
- <thead>
-  <tr>
-   <th style="text-align:left;"> Batch </th>
-   <th style="text-align:left;"> No_norm </th>
-   <th style="text-align:left;"> TIC_norm </th>
-   <th style="text-align:left;"> IS_norm </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Intraday 1 </td>
-   <td style="text-align:left;"> 70.5% </td>
-   <td style="text-align:left;"> 63.511% </td>
-   <td style="text-align:left;"> 10.475% </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Intraday 2 </td>
-   <td style="text-align:left;"> 41.414% </td>
-   <td style="text-align:left;"> 38.884% </td>
-   <td style="text-align:left;"> 13.597% </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Intraday 3 </td>
-   <td style="text-align:left;"> 34.072% </td>
-   <td style="text-align:left;"> 36.26% </td>
-   <td style="text-align:left;"> 17.122% </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Interday </td>
-   <td style="text-align:left;"> 52.048% </td>
-   <td style="text-align:left;"> 50.685% </td>
-   <td style="text-align:left;"> 14.11% </td>
-  </tr>
-</tbody>
-</table>
-```
-:::
-
-::: {.output .display_data}
-```{=html}
-<h2 style='text-align: center;'>Overview RSD Table Internal Standard</h2> <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
- <thead>
-  <tr>
-   <th style="text-align:left;"> Batch </th>
-   <th style="text-align:left;"> No_norm </th>
-   <th style="text-align:left;"> TIC_norm </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Intraday 1 </td>
-   <td style="text-align:left;"> 73.808% </td>
-   <td style="text-align:left;"> 66.959% </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Intraday 2 </td>
-   <td style="text-align:left;"> 39.711% </td>
-   <td style="text-align:left;"> 38.576% </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Intraday 3 </td>
-   <td style="text-align:left;"> 35.566% </td>
-   <td style="text-align:left;"> 36.631% </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Interday </td>
-   <td style="text-align:left;"> 53.147% </td>
-   <td style="text-align:left;"> 53.139% </td>
-  </tr>
-</tbody>
-</table>
-```
-:::
-
-::: {.output .display_data}
-![](vertopal_20fe299090dc4c09b975252af89eaaf2/3589b1948b2860001b81a0e8bc0ce6316fab2d6d.png){height="1200"
-width="1800"}
-:::
-::::::::::::::::::::::::::::::::::::
-
-::: {#ea424496-c410-44ea-8b04-f88063a0c5a6 .cell .markdown}
-## Saving the HTML tables and PNG plots
-:::
-
-::: {#fc8c7a8d-a5f9-4636-9865-73713989265e .cell .code execution_count="87" vscode="{\"languageId\":\"r\"}"}
-``` r
-library(kableExtra)
-library(htmltools)
-library(IRdisplay)
-
-# Function to save the HTML table to a file
-save_html_table <- function(html_content, file_path) {
-  # Create a full HTML document with the necessary CSS and HTML structure
-  html_document <- tags$html(
-    tags$head(
-      tags$meta(charset = "UTF-8"),
-      tags$title("RSD Table"),
-      tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/kableExtra/1.3.4/kableExtra.min.css"),
-      tags$style(
-        HTML(
-          ".kable-table { width: auto !important; margin-left: auto !important; margin-right: auto !important; }
-           table, th, td { border: 1px solid black; border-collapse: collapse; }
-           th, td { padding: 5px; text-align: left; }"
-        )
-      )
-    ),
-    tags$body(
-      HTML(html_content)
-    )
-  )
-  
-  # Write the full HTML document to the specified file path
-  save_html(html_document, file = file_path)
-}
-
-# Saves each result in the result folder
-if (!dir.exists("Output")) {
-  dir.create("Output")
-}
-
-# Save the RSD table to a file
-save_html_table(display_rsd_table_pro, "Output/propranolol_rsd.html")
-save_html_table(display_rsd_table_pro_d7, "Output/d7_propranolol_rsd.html")
-
-# Saving the intensity plot to a file
-file_path <- "Output/intensity_plots.png"
-ggsave(file_path, plot = combined_intensity_plot, width = 40, height = 10, dpi = 300)
-
-# Saving the violin plot QCS to a file
-file_path <- "Output/violin_QCS_plots.png"
-ggsave(file_path, plot = combined_violin_plot, width = 40, height = 10, dpi = 300)
-
-# Saving the violin plot Internal Standard to a file
-file_path <- "Output/violin_IS_plots.png"
-ggsave(file_path, plot = combined_violin_plot_d7, width = 40, height = 10, dpi = 300)
-
-# Saving the VCA plot QCS to a file
-file_path <- "Output/vca_QCS_plots.png"
-ggsave(file_path, plot = combined_vca_plot, width = 40, height = 10, dpi = 300)
-
-# Saving the VCA plot QCS to a file
-file_path <- "Output/vca_IS_plots.png"
-ggsave(file_path, plot = combined_vca_plot_IS, width = 40, height = 10, dpi = 300)
-```
-:::
-
-::::: {#ff251986-c629-4dce-8196-848dddf0175a .cell .code execution_count="89" vscode="{\"languageId\":\"r\"}"}
-``` r
-# Saving PNG Plots into one PDF file
-library(grid)
-library(png)
-
-# List all PNG files in the output folder
-png_files <- list.files("Output", pattern = "\\.png$", full.names = TRUE)
-
-# Read each PNG file into a list of rasterGrob objects
-plots <- lapply(png_files, function(file) {
-  png_plot <- png::readPNG(file)
-  grid::rasterGrob(png_plot, interpolate = TRUE)
-})
-
-# Create a PDF file with each plot on a separate page
-pdf("Output/PNG_plots.pdf", width = 11, height = 8.5)  # Adjust width and height as needed
-
-for (plot in plots) {
-  grid.newpage()  # Start a new page
-  grid.draw(plot)  # Draw the plot
-}
-
-dev.off()
-
-cat("All png plots saved to separate pages within a single PDF file in the Output file.")
-```
-
-::: {.output .display_data}
-**pdf:** 2
-:::
-
-::: {.output .stream .stdout}
-```         
-All png plots saved to separate pages within a single PDF file in the Output file.
-```
-:::
-:::::
-
-::: :::::::::::::::::::::::::::::::::::::::::
-:::
-
-::: ::::::::::::::::::::::::::::::::::::::::
-:::
-
-::::::::::::::::::::::::::::::::::::::::::
+:::::::::::::::::::::::::
