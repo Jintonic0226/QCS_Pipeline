@@ -297,17 +297,17 @@ if (length(missing_sample_sets) > 0) {
 }
 
 # Check if m/z values exist in rows
-propranolol_mz_exist <- any(combined_batch_data_df_2$mz == QCS_mz_value_2)
-d7_propranolol_mz_exist <- any(combined_batch_data_df_2$mz == IS_mz_value_2)
+QCSmz_exist <- any(combined_batch_data_df_2$mz == QCS_mz_value_2)
+IS_mz_exist <- any(combined_batch_data_df_2$mz == IS_mz_value_2)
 
 # Print messages based on existence
-if (!propranolol_mz_exist) {
+if (!QCSmz_exist) {
   message("Error: The QCS m/z value ", QCS_mz_value_2, " does not exist in any row.")
 } else {
   message("The QCS m/z value ", IS_mz_value_2, " exists in at least one row.")
 }
 
-if (!d7_propranolol_mz_exist) {
+if (!IS_mz_exist) {
   message("Error: The Internal Standard m/z value ", IS_mz_value_2, " does not exist in any row.")
 } else {
   message("The Internal Standard m/z value ", IS_mz_value_2, " exists in at least one row.")
@@ -426,25 +426,25 @@ batch_info_columns <- qcs_batch_info_data[, 1:2, drop = FALSE]
 
 # extract qcs data
 # propranolol
-propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == QCS_mz_value_2, drop = FALSE]
-col_names <- rownames(propranolol_peak_data)
-propranolol_data <- cbind(batch_info_columns, propranolol_peak_data)
+QCSpeak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == QCS_mz_value_2, drop = FALSE]
+col_names <- rownames(QCSpeak_data)
+QCSdata <- cbind(batch_info_columns, QCSpeak_data)
 
-propranolol_peak_data_trans <- as.data.frame(t(propranolol_peak_data))
-colnames(propranolol_peak_data_trans) <- col_names 
-propranolol_peak_data_trans <- as.numeric(propranolol_peak_data_trans)
+QCSpeak_data_trans <- as.data.frame(t(QCSpeak_data))
+colnames(QCSpeak_data_trans) <- col_names 
+QCSpeak_data_trans <- as.numeric(QCSpeak_data_trans)
 
 # IS 
-d7_propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == IS_mz_value_2, drop = FALSE]
-col_names <- rownames(d7_propranolol_peak_data)
-d7_propranolol_data <- cbind(batch_info_columns, d7_propranolol_peak_data)
+IS_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == IS_mz_value_2, drop = FALSE]
+col_names <- rownames(IS_peak_data)
+IS_data <- cbind(batch_info_columns, IS_peak_data)
 
-d7_propranolol_peak_data_trans <- as.data.frame(t(d7_propranolol_peak_data))
-colnames(d7_propranolol_peak_data_trans) <- col_names 
-d7_propranolol_peak_data_trans <- as.numeric(d7_propranolol_peak_data_trans)
+IS_peak_data_trans <- as.data.frame(t(IS_peak_data))
+colnames(IS_peak_data_trans) <- col_names 
+IS_peak_data_trans <- as.numeric(IS_peak_data_trans)
 
-# IS normalization = propranolol / d7_propranolol
-ratio <- propranolol_peak_data_trans / d7_propranolol_peak_data_trans
+# IS normalization = propranolol / IS
+ratio <- QCSpeak_data_trans / IS_peak_data_trans
 ratio_df <- as.data.frame(ratio)
 rownames(ratio_df) <- col_names
 ratio_data <- cbind(batch_info_columns,ratio_df)
@@ -527,22 +527,22 @@ calculate_batch_rsd <- function(data, mz_value) {
 qcs_batch_info_data <- extract_qcs_data(combined_batch_info_data_2, sample_set_2)
 batch_info_columns <- qcs_batch_info_data[, 1:2, drop = FALSE]
 # extract qcs data
-propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == QCS_mz_value_2, drop = FALSE]
-propranolol_data <- cbind(batch_info_columns, propranolol_peak_data)
+QCS_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == QCS_mz_value_2, drop = FALSE]
+QCS_data <- cbind(batch_info_columns, QCSpeak_data)
 
-d7_propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == IS_mz_value_2, drop = FALSE]
-d7_propranolol_data <- cbind(batch_info_columns, d7_propranolol_peak_data)
+IS_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == IS_mz_value_2, drop = FALSE]
+IS_data <- cbind(batch_info_columns, IS_peak_data)
 
 # usage:
-rsd_propranolol <- calculate_batch_rsd(propranolol_data, QCS_mz_value_2)
+rsdQCS <- calculate_batch_rsd(QCSdata, QCS_mz_value_2)
 cat("\033[1mSucessfully calculated rsd (QCS) for no normalization dataset.\033[0m\n")
 cat("m/z value:", QCS_mz_value_2, "\n")
-print(rsd_propranolol)
+print(rsdQCS)
                            
-rsd_d7_propranolol <- calculate_batch_rsd(d7_propranolol_data, IS_mz_value_2)
+rsd_IS <- calculate_batch_rsd(IS_data, IS_mz_value_2)
 cat("\033[1mSucessfully calculated rsd (Internal Standard) for no normalization dataset.\033[0m\n")
 cat("m/z value:", IS_mz_value_2, "\n")
-print(rsd_d7_propranolol)
+print(rsd_IS)
 ```
 :::
 
@@ -555,22 +555,22 @@ qcs_batch_info_data <- extract_qcs_data(combined_batch_info_data_TIC_2, sample_s
 batch_info_columns <- qcs_batch_info_data[, 1:2, drop = FALSE]
 
 # extract qcs data
-propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == QCS_mz_value_2, drop = FALSE]
-propranolol_data_TIC <- cbind(batch_info_columns, propranolol_peak_data)
+QCSpeak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == QCS_mz_value_2, drop = FALSE]
+QCSdata_TIC <- cbind(batch_info_columns, QCSpeak_data)
 
-d7_propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == IS_mz_value_2, drop = FALSE]
-d7_propranolol_data_TIC <- cbind(batch_info_columns, d7_propranolol_peak_data)
+IS_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == IS_mz_value_2, drop = FALSE]
+IS_data_TIC <- cbind(batch_info_columns, IS_peak_data)
 
 # usage                      
-rsd_propranolol_TIC <- calculate_batch_rsd(propranolol_data_TIC, QCS_mz_value_2)
+rsd_QCSTIC <- calculate_batch_rsd(QCSdata_TIC, QCS_mz_value_2)
 cat("\033[1mSucessfully calculated rsd (QCS) for TIC normalization dataset.\033[0m\n")
 cat("m/z value:", QCS_mz_value_2, "\n")
-print(rsd_propranolol_TIC)
+print(rsd_QCSTIC)
                            
-rsd_d7_propranolol_TIC <- calculate_batch_rsd(d7_propranolol_data_TIC, IS_mz_value_2)
+rsd_IS_TIC <- calculate_batch_rsd(IS_data_TIC, IS_mz_value_2)
 cat("\033[1mSucessfully calculated rsd (Internal Standard) for TIC normalization dataset.\033[0m\n")
 cat("m/z value:", QCS_mz_value_2, "\n")
-print(rsd_d7_propranolol_TIC)
+print(rsd_IS_TIC)
 ```
 :::
 
@@ -593,8 +593,8 @@ library(kableExtra)
 ## Create Overview RSD Table
 overview_table_QCS <- data.frame(
   Batch = c("Intraday 1", "Intraday 2", "Intraday 3", "Interday"),
-  No_Norm_RSD = rsd_propranolol[,2],
-  TIC_Norm_RSD = rsd_propranolol_TIC[,2],
+  No_Norm_RSD = rsdQCS[,2],
+  TIC_Norm_RSD = rsd_QCSTIC[,2],
   IS_Norm_RSD = rsd_ratio[,2]
 )
 colnames(overview_table_QCS) <- c("Batch", "No_norm", "TIC_norm", "IS_norm")
@@ -614,8 +614,8 @@ library(kableExtra)
 ## Create Overview RSD Table
 overview_table_IS <- data.frame(
   Batch = c("Intraday 1", "Intraday 2", "Intraday 3", "Interday"),
-  No_Norm_RSD = rsd_propranolol[,2],
-  TIC_Norm_RSD = rsd_propranolol_TIC[,2],
+  No_Norm_RSD = rsdQCS[,2],
+  TIC_Norm_RSD = rsd_QCSTIC[,2],
   IS_Norm_RSD = rsd_ratio[,2]
 )
 colnames(overview_table_QCS) <- c("Batch", "No_norm", "TIC_norm", "IS_norm")
@@ -632,9 +632,9 @@ library(IRdisplay)
 
 # Dynamically create the overview table
 overview_table_IS <- data.frame(
-  Row_Names = rsd_d7_propranolol$Batch,
-  No_Norm_RSD = rsd_d7_propranolol$RSD,
-  TIC_Norm_RSD = rsd_d7_propranolol_TIC$RSD
+  Row_Names = rsd_IS$Batch,
+  No_Norm_RSD = rsd_IS$RSD,
+  TIC_Norm_RSD = rsd_IS_TIC$RSD
 )
 
 # Displaying RSD table
@@ -687,9 +687,9 @@ s_values <- as.numeric(sub(".*S(\\d+).*", "\\1", row_names_qcs))
 qcs_batch_info_data_ordered$S <- s_values
 qcs_batch_info_data_ordered <- qcs_batch_info_data_ordered[order(qcs_batch_info_data_ordered$batch, qcs_batch_info_data_ordered$S), ]
 
-propranolol_intensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == QCS_mz_value_2, drop = FALSE]
-propranolol_intensity_values <- as.numeric(unlist(propranolol_intensity))
-propranolol_intensity <- scale(propranolol_intensity_values)
+QCSintensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == QCS_mz_value_2, drop = FALSE]
+QCSintensity_values <- as.numeric(unlist(QCSintensity))
+QCSintensity <- scale(QCSintensity_values)
 
 # intensity plot based on measurement_order
 qcs_batch_info_data_ordered$measurement_order <- seq_len(nrow(qcs_batch_info_data_ordered))
@@ -697,7 +697,7 @@ qcs_batch_info_data_ordered$measurement_order <- seq_len(nrow(qcs_batch_info_dat
 plot_data_scaled <- data.frame(
   Measurement_order = qcs_batch_info_data_ordered$measurement_order,
   Batch = qcs_batch_info_data_ordered$batch,
-  Intensity = propranolol_intensity
+  Intensity = QCSintensity
 )
 
 mean_intensity <- mean(plot_data_scaled$Intensity)
@@ -741,9 +741,9 @@ s_values <- as.numeric(sub(".*S(\\d+).*", "\\1", row_names_qcs))
 qcs_batch_info_data_ordered$S <- s_values
 qcs_batch_info_data_ordered <- qcs_batch_info_data_ordered[order(qcs_batch_info_data_ordered$batch, qcs_batch_info_data_ordered$S), ]
 
-propranolol_intensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == QCS_mz_value_2, drop = FALSE]
-propranolol_intensity_values <- as.numeric(unlist(propranolol_intensity))
-propranolol_intensity <- scale(propranolol_intensity_values)
+QCSintensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == QCS_mz_value_2, drop = FALSE]
+QCSintensity_values <- as.numeric(unlist(QCSintensity))
+QCSintensity <- scale(QCSintensity_values)
 
 # intensity plot based on measurement_order
 qcs_batch_info_data_ordered$measurement_order <- seq_len(nrow(qcs_batch_info_data_ordered))
@@ -751,7 +751,7 @@ qcs_batch_info_data_ordered$measurement_order <- seq_len(nrow(qcs_batch_info_dat
 plot_data_scaled <- data.frame(
   Measurement_order = qcs_batch_info_data_ordered$measurement_order,
   Batch = qcs_batch_info_data_ordered$batch,
-  Intensity = propranolol_intensity
+  Intensity = QCSintensity
 )
 
 rownames(plot_data_scaled) <- rownames(qcs_batch_info_data_ordered)
@@ -806,13 +806,13 @@ qcs_batch_info_data_ordered <- qcs_batch_info_data_ordered[order(qcs_batch_info_
 qcs_batch_info_data_ordered$measurement_order <- seq_len(nrow(qcs_batch_info_data_ordered))
 batch <- qcs_batch_info_data_ordered$batch
 
-propranolol_intensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == QCS_mz_value_2, drop = FALSE] 
-propranolol_intensity_values <- as.numeric(unlist(propranolol_intensity))
+QCSintensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == QCS_mz_value_2, drop = FALSE] 
+QCSintensity_values <- as.numeric(unlist(QCSintensity))
 
-d7_propranolol_intensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == IS_mz_value_2, drop = FALSE] 
-d7_propranolol_intensity_values <- as.numeric(unlist(d7_propranolol_intensity))
+IS_intensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == IS_mz_value_2, drop = FALSE] 
+IS_intensity_values <- as.numeric(unlist(IS_intensity))
 
-ratio_intensity <- propranolol_intensity_values / d7_propranolol_intensity_values
+ratio_intensity <- QCSintensity_values / IS_intensity_values
 ratio_intensity <- scale(ratio_intensity)
 
 # making data frame
@@ -899,18 +899,18 @@ scale_by_mean <- function(data_frame) {
 
 # No Normalization Dataset #
 # Transform and prepare the dataset
-propranolol_data_trans <- as.data.frame(t(propranolol_data))
-propranolol_data_trans[] <- lapply(propranolol_data_trans, as.numeric)
+QCSdata_trans <- as.data.frame(t(QCSdata))
+QCSdata_trans[] <- lapply(QCSdata_trans, as.numeric)
 
 # Extract slide number
-slide_number <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans))
+slide_number <- gsub("^.*S(\\d+)_.*", "\\1", names(QCSdata_trans))
 slide_number <- as.numeric(slide_number)
 
 # Create violin plot data frame
 violin_data <- data.frame(
   Slide = slide_number,
-  Batch = propranolol_data$batch,
-  Value = unlist(propranolol_data_trans[3, ])
+  Batch = QCSdata$batch,
+  Value = unlist(QCSdata_trans[3, ])
 )
 
 # Scale No Normalization data by its mean
@@ -918,18 +918,18 @@ violin_data <- scale_by_mean(violin_data)
 
 # TIC Normalization Dataset #
 # Transform and prepare the dataset
-propranolol_data_trans_TIC <- as.data.frame(t(propranolol_data_TIC))
-propranolol_data_trans_TIC[] <- lapply(propranolol_data_trans_TIC, as.numeric)
+QCSdata_trans_TIC <- as.data.frame(t(QCSdata_TIC))
+QCSdata_trans_TIC[] <- lapply(QCSdata_trans_TIC, as.numeric)
 
 # Extract slide number
-slide_number_TIC <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans_TIC))
+slide_number_TIC <- gsub("^.*S(\\d+)_.*", "\\1", names(QCSdata_trans_TIC))
 slide_number_TIC <- as.numeric(slide_number_TIC)
 
 # Create violin plot data frame
 violin_data_TIC <- data.frame(
   Slide = slide_number_TIC,
-  Batch = propranolol_data$batch,
-  Value = unlist(propranolol_data_trans_TIC[3, ])
+  Batch = QCSdata$batch,
+  Value = unlist(QCSdata_trans_TIC[3, ])
 )
 
 # Scale TIC Normalization data by its mean
@@ -937,18 +937,18 @@ violin_data_TIC <- scale_by_mean(violin_data_TIC)
 
 # IS Normalization Dataset #
 # Transform and prepare the dataset
-propranolol_data_trans_IS <- as.data.frame(t(ratio_data))
-propranolol_data_trans_IS[] <- lapply(propranolol_data_trans_IS, as.numeric)
+QCSdata_trans_IS <- as.data.frame(t(ratio_data))
+QCSdata_trans_IS[] <- lapply(QCSdata_trans_IS, as.numeric)
 
 # Extract slide number
-slide_number_IS <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans_IS))
+slide_number_IS <- gsub("^.*S(\\d+)_.*", "\\1", names(QCSdata_trans_IS))
 slide_number_IS <- as.numeric(slide_number_IS)
 
 # Create violin plot data frame
 violin_data_IS <- data.frame(
   Slide = slide_number_IS,
   Batch = ratio_data$batch,
-  Value = unlist(propranolol_data_trans_IS[3, ])
+  Value = unlist(QCSdata_trans_IS[3, ])
 )
 
 # Scale IS Normalization data by its mean
@@ -1040,18 +1040,18 @@ scale_by_mean <- function(data_frame) {
 
 # No Normalization Dataset #
 # Transform and prepare the dataset
-propranolol_data_trans <- as.data.frame(t(d7_propranolol_data))
-propranolol_data_trans[] <- lapply(propranolol_data_trans, as.numeric)
+QCSdata_trans <- as.data.frame(t(IS_data))
+QCSdata_trans[] <- lapply(QCSdata_trans, as.numeric)
 
 # Extract slide number
-slide_number <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans))
+slide_number <- gsub("^.*S(\\d+)_.*", "\\1", names(QCSdata_trans))
 slide_number <- as.numeric(slide_number)
 
 # Create violin plot data frame
 violin_data <- data.frame(
   Slide = slide_number,
-  Batch = propranolol_data$batch,
-  Value = unlist(propranolol_data_trans[3, ])
+  Batch = QCSdata$batch,
+  Value = unlist(QCSdata_trans[3, ])
 )
 
 # Scale No Normalization data by its mean
@@ -1103,18 +1103,18 @@ print(violin_plot_jit_d7)
 
 # TIC Normalization Dataset #
 # Transform and prepare the dataset
-propranolol_data_trans_TIC <- as.data.frame(t(d7_propranolol_data_TIC))
-propranolol_data_trans_TIC[] <- lapply(propranolol_data_trans_TIC, as.numeric)
+QCSdata_trans_TIC <- as.data.frame(t(IS_data_TIC))
+QCSdata_trans_TIC[] <- lapply(QCSdata_trans_TIC, as.numeric)
 
 # Extract slide number
-slide_number_TIC <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans_TIC))
+slide_number_TIC <- gsub("^.*S(\\d+)_.*", "\\1", names(QCSdata_trans_TIC))
 slide_number_TIC <- as.numeric(slide_number_TIC)
 
 # Create violin plot data frame
 violin_data_TIC <- data.frame(
   Slide = slide_number_TIC,
-  Batch = propranolol_data$batch,
-  Value = unlist(propranolol_data_trans_TIC[3, ])
+  Batch = QCSdata$batch,
+  Value = unlist(QCSdata_trans_TIC[3, ])
 )
 
 # Scale TIC Normalization data by its mean
@@ -2512,21 +2512,21 @@ qcs_batch_info_data <- extract_qcs_data(transposed_data, sample_set_2)
 batch_info_columns <- qcs_batch_info_data[, 1:2, drop = FALSE]
 
 # extract qcs data
-propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == QCS_mz_value_2, drop = FALSE]
-propranolol_data_combat <- cbind(batch_info_columns, propranolol_peak_data)
+QCSpeak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == QCS_mz_value_2, drop = FALSE]
+QCSdata_combat <- cbind(batch_info_columns, QCSpeak_data)
 
-d7_propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == IS_mz_value_2, drop = FALSE]
-d7_propranolol_data_combat <- cbind(batch_info_columns, d7_propranolol_peak_data)
+IS_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == IS_mz_value_2, drop = FALSE]
+IS_data_combat <- cbind(batch_info_columns, IS_peak_data)
 
 # usage:
 cat("\033[1mRSD for Combat:\033[0m\n")                                   
-rsd_propranolol_combat <- calculate_batch_rsd(propranolol_data_combat, QCS_mz_value_2)
+rsd_QCScombat <- calculate_batch_rsd(QCSdata_combat, QCS_mz_value_2)
 cat("m/z value:", QCS_mz_value_2, "\n")
-print(rsd_propranolol_combat)
+print(rsd_QCScombat)
 
-rsd_d7_propranolol_combat <- calculate_batch_rsd(d7_propranolol_data_combat, IS_mz_value_2)
+rsd_IS_combat <- calculate_batch_rsd(IS_data_combat, IS_mz_value_2)
 cat("m/z value:", IS_mz_value_2, "\n")
-print(rsd_d7_propranolol_combat)
+print(rsd_IS_combat)
 ```
 :::
 
@@ -2562,20 +2562,20 @@ qcs_batch_info_data <- extract_qcs_data(transposed_data, sample_set_2)
 batch_info_columns <- qcs_batch_info_data[, 1:2, drop = FALSE]
 
 # extract qcs data
-propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == QCS_mz_value_2, drop = FALSE]
-propranolol_data_wave <- cbind(batch_info_columns, propranolol_peak_data)
-d7_propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == IS_mz_value_2, drop = FALSE]
-d7_propranolol_data_wave <- cbind(batch_info_columns, d7_propranolol_peak_data)
+QCSpeak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == QCS_mz_value_2, drop = FALSE]
+QCSdata_wave <- cbind(batch_info_columns, QCSpeak_data)
+IS_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == IS_mz_value_2, drop = FALSE]
+IS_data_wave <- cbind(batch_info_columns, IS_peak_data)
 
 # usage:
 cat("\033[1mRSD for WaveICA:\033[0m\n")                                   
-rsd_propranolol_wave <- calculate_batch_rsd(propranolol_data_wave, QCS_mz_value_2)
+rsd_QCSwave <- calculate_batch_rsd(QCSdata_wave, QCS_mz_value_2)
 cat("m/z value:", QCS_mz_value_2, "\n")
-print(rsd_propranolol_wave)
+print(rsd_QCSwave)
 
-rsd_d7_propranolol_wave <- calculate_batch_rsd(d7_propranolol_data_wave, IS_mz_value_2)
+rsd_IS_wave <- calculate_batch_rsd(IS_data_wave, IS_mz_value_2)
 cat("m/z value:", IS_mz_value_2, "\n")
-print(rsd_d7_propranolol_wave)
+print(rsd_IS_wave)
 ```
 :::
 
@@ -2604,23 +2604,23 @@ qcs_batch_info_data <- extract_qcs_data(transposed_data, sample_set_2)
 batch_info_columns <- qcs_batch_info_data[, 1:2, drop = FALSE]
 
 # extract qcs data
-propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == QCS_mz_value_2, drop = FALSE]
-propranolol_data_norm <- cbind(batch_info_columns, propranolol_peak_data)
-propranolol_data_norm$batch <- propranolol_data_norm$batch + 1
+QCSpeak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == QCS_mz_value_2, drop = FALSE]
+QCSdata_norm <- cbind(batch_info_columns, QCSpeak_data)
+QCSdata_norm$batch <- QCSdata_norm$batch + 1
 
-d7_propranolol_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == IS_mz_value_2, drop = FALSE]
-d7_propranolol_data_norm <- cbind(batch_info_columns, d7_propranolol_peak_data)
-d7_propranolol_data_norm$batch <- d7_propranolol_data_norm$batch + 1
+IS_peak_data <- qcs_batch_info_data[,colnames(qcs_batch_info_data) == IS_mz_value_2, drop = FALSE]
+IS_data_norm <- cbind(batch_info_columns, IS_peak_data)
+IS_data_norm$batch <- IS_data_norm$batch + 1
 
 # usage:
 cat("\033[1mRSD for NormAE:\033[0m\n")                    
-rsd_propranolol_norm <- calculate_batch_rsd(propranolol_data_norm, QCS_mz_value_2)
+rsd_QCSnorm <- calculate_batch_rsd(QCSdata_norm, QCS_mz_value_2)
 cat("m/z value:", QCS_mz_value_2, "\n")
-print(rsd_propranolol_norm)
+print(rsd_QCSnorm)
 
-rsd_d7_propranolol_norm <- calculate_batch_rsd(d7_propranolol_data_norm, IS_mz_value_2)
+rsd_IS_norm <- calculate_batch_rsd(IS_data_norm, IS_mz_value_2)
 cat("m/z value:", IS_mz_value_2, "\n")
-print(rsd_d7_propranolol_norm)
+print(rsd_IS_norm)
 ```
 :::
 
@@ -2634,9 +2634,9 @@ library(IRdisplay)
 # propranolol #
 overview_table_QCS <- data.frame(
   Row_Names = c("Intraday 1", "Intraday 2", "Intraday 3", "Interday"),
-  Combat_RSD = rsd_propranolol_combat[2],
-  WaveICA_RSD = rsd_propranolol_wave[2],
-  NormAE_RSD = rsd_propranolol_norm[2]
+  Combat_RSD = rsd_QCScombat[2],
+  WaveICA_RSD = rsd_QCSwave[2],
+  NormAE_RSD = rsd_QCSnorm[2]
 )
 
 # Set the column names
@@ -2656,9 +2656,9 @@ print(display_rsd_table_QCS)
 # D7-propranolol # 
 overview_table_IS <- data.frame(
   Row_Names = c("Intraday 1", "Intraday 2", "Intraday 3", "Interday"),
-  Combat_RSD = rsd_d7_propranolol_combat[2],
-  WaveICA_RSD = rsd_d7_propranolol_wave[2],
-  NormAE_RSD = rsd_d7_propranolol_norm[2]
+  Combat_RSD = rsd_IS_combat[2],
+  WaveICA_RSD = rsd_IS_wave[2],
+  NormAE_RSD = rsd_IS_norm[2]
 )
 
 # Set the column names
@@ -2708,9 +2708,9 @@ qcs_batch_info_data_ordered$S <- s_values
 qcs_batch_info_data_ordered <- qcs_batch_info_data_ordered[order(qcs_batch_info_data_ordered$batch, qcs_batch_info_data_ordered$S), ]
 
 # extract propranolol only
-propranolol_intensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == QCS_mz_value_2, drop = FALSE]
-propranolol_intensity_values <- as.numeric(unlist(propranolol_intensity))
-propranolol_intensity <- scale(propranolol_intensity_values) # scaling intensity plot
+QCSintensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == QCS_mz_value_2, drop = FALSE]
+QCSintensity_values <- as.numeric(unlist(QCSintensity))
+QCSintensity <- scale(QCSintensity_values) # scaling intensity plot
 
 # add measurement order
 qcs_batch_info_data_ordered$measurement_order <- seq_len(nrow(qcs_batch_info_data_ordered))
@@ -2719,7 +2719,7 @@ qcs_batch_info_data_ordered$measurement_order <- seq_len(nrow(qcs_batch_info_dat
 plot_data_scaled <- data.frame(
   Measurement_order = qcs_batch_info_data_ordered$measurement_order,
   Batch = qcs_batch_info_data_ordered$batch,
-  Intensity = propranolol_intensity
+  Intensity = QCSintensity
 )
 
 # add rownames to plot_data_scaled
@@ -2773,9 +2773,9 @@ qcs_batch_info_data_ordered$S <- s_values
 qcs_batch_info_data_ordered <- qcs_batch_info_data_ordered[order(qcs_batch_info_data_ordered$batch, qcs_batch_info_data_ordered$S), ]
 
 # extract propranolol intensity
-propranolol_intensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == QCS_mz_value_2, drop = FALSE] # 126 obs 1 variable
-propranolol_intensity_values <- as.numeric(unlist(propranolol_intensity))
-propranolol_intensity <- scale(propranolol_intensity_values)
+QCSintensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == QCS_mz_value_2, drop = FALSE] # 126 obs 1 variable
+QCSintensity_values <- as.numeric(unlist(QCSintensity))
+QCSintensity <- scale(QCSintensity_values)
 
 # add measurement_order
 qcs_batch_info_data_ordered$measurement_order <- seq_len(nrow(qcs_batch_info_data_ordered))
@@ -2784,7 +2784,7 @@ qcs_batch_info_data_ordered$measurement_order <- seq_len(nrow(qcs_batch_info_dat
 plot_data_scaled <- data.frame(
   Measurement_order = qcs_batch_info_data_ordered$measurement_order,
   Batch = qcs_batch_info_data_ordered$batch,
-  Intensity = propranolol_intensity
+  Intensity = QCSintensity
 )
 
 # add rownames to plot_data_scaled
@@ -2839,9 +2839,9 @@ qcs_batch_info_data_ordered$S <- s_values
 qcs_batch_info_data_ordered <- qcs_batch_info_data_ordered[order(qcs_batch_info_data_ordered$batch, qcs_batch_info_data_ordered$S), ]
 
 # extracting propranolol intensity
-propranolol_intensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == QCS_mz_value_2, drop = FALSE]
-propranolol_intensity_values <- as.numeric(unlist(propranolol_intensity))
-propranolol_intensity <- scale(propranolol_intensity_values)
+QCSintensity <- qcs_batch_info_data_ordered[,colnames(qcs_batch_info_data_ordered) == QCS_mz_value_2, drop = FALSE]
+QCSintensity_values <- as.numeric(unlist(QCSintensity))
+QCSintensity <- scale(QCSintensity_values)
 
 # add measurement_order
 qcs_batch_info_data_ordered$measurement_order <- seq_len(nrow(qcs_batch_info_data_ordered))
@@ -2850,7 +2850,7 @@ qcs_batch_info_data_ordered$measurement_order <- seq_len(nrow(qcs_batch_info_dat
 plot_data_scaled <- data.frame(
   Measurement_order = qcs_batch_info_data_ordered$measurement_order,
   Batch = qcs_batch_info_data_ordered$batch,
-  Intensity = propranolol_intensity
+  Intensity = QCSintensity
 )
 
 # add rownames to plot_data_scaled
@@ -2920,18 +2920,18 @@ scale_by_mean <- function(data_frame) {
 }
 
 # Transform and prepare the dataset for Combat
-propranolol_data_trans_combat <- as.data.frame(t(propranolol_data_combat))
-propranolol_data_trans_combat[] <- lapply(propranolol_data_trans_combat, as.numeric)
+QCSdata_trans_combat <- as.data.frame(t(QCSdata_combat))
+QCSdata_trans_combat[] <- lapply(QCSdata_trans_combat, as.numeric)
 
 # Extract slide number
-slide_number_combat <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans_combat))
+slide_number_combat <- gsub("^.*S(\\d+)_.*", "\\1", names(QCSdata_trans_combat))
 slide_number_combat <- as.numeric(slide_number_combat)
 
 # Create violin plot data frame for Combat
 violin_data_combat <- data.frame(
   Slide = slide_number_combat,
-  Batch = propranolol_data_combat$batch,
-  Value = unlist(propranolol_data_trans_combat[3, ])
+  Batch = QCSdata_combat$batch,
+  Value = unlist(QCSdata_trans_combat[3, ])
 )
 
 # Scale Combat data by its mean
@@ -2980,18 +2980,18 @@ violin_plot_combat_jit <- plot_violin(violin_data_combat, "Combat (QCS)")
 print(violin_plot_combat_jit)
 
 # Transform and prepare the dataset for WaveICA
-propranolol_data_trans_wave <- as.data.frame(t(propranolol_data_wave))
-propranolol_data_trans_wave[] <- lapply(propranolol_data_trans_wave, as.numeric)
+QCSdata_trans_wave <- as.data.frame(t(QCSdata_wave))
+QCSdata_trans_wave[] <- lapply(QCSdata_trans_wave, as.numeric)
 
 # Extract slide number
-slide_number_wave <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans_wave))
+slide_number_wave <- gsub("^.*S(\\d+)_.*", "\\1", names(QCSdata_trans_wave))
 slide_number_wave <- as.numeric(slide_number_wave)
 
 # Create violin plot data frame for WaveICA
 violin_data_wave <- data.frame(
   Slide = slide_number_wave,
-  Batch = propranolol_data_wave$batch,
-  Value = unlist(propranolol_data_trans_wave[3, ])
+  Batch = QCSdata_wave$batch,
+  Value = unlist(QCSdata_trans_wave[3, ])
 )
 
 # Scale WaveICA data by its mean
@@ -3002,18 +3002,18 @@ violin_plot_wave_jit <- plot_violin(violin_data_wave, "WaveICA (QCS)")
 print(violin_plot_wave_jit)
 
 # Transform and prepare the dataset for NormAE
-propranolol_data_trans_norm <- as.data.frame(t(propranolol_data_norm))
-propranolol_data_trans_norm[] <- lapply(propranolol_data_trans_norm, as.numeric)
+QCSdata_trans_norm <- as.data.frame(t(QCSdata_norm))
+QCSdata_trans_norm[] <- lapply(QCSdata_trans_norm, as.numeric)
 
 # Extract slide number
-slide_number_norm <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans_norm))
+slide_number_norm <- gsub("^.*S(\\d+)_.*", "\\1", names(QCSdata_trans_norm))
 slide_number_norm <- as.numeric(slide_number_norm)
 
 # Create violin plot data frame for NormAE
 violin_data_norm <- data.frame(
   Slide = slide_number_norm,
-  Batch = propranolol_data_norm$batch,
-  Value = unlist(propranolol_data_trans_norm[3, ])
+  Batch = QCSdata_norm$batch,
+  Value = unlist(QCSdata_trans_norm[3, ])
 )
 
 # Scale NormAE data by its mean
@@ -3091,18 +3091,18 @@ plot_violin <- function(data, title) {
 
 # Combat Plot
 # Transform and prepare the dataset for Combat
-propranolol_data_trans_combat <- as.data.frame(t(d7_propranolol_data_combat))
-propranolol_data_trans_combat[] <- lapply(propranolol_data_trans_combat, as.numeric)
+QCSdata_trans_combat <- as.data.frame(t(IS_data_combat))
+QCSdata_trans_combat[] <- lapply(QCSdata_trans_combat, as.numeric)
 
 # Extract slide number
-slide_number_combat <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans_combat))
+slide_number_combat <- gsub("^.*S(\\d+)_.*", "\\1", names(QCSdata_trans_combat))
 slide_number_combat <- as.numeric(slide_number_combat)
 
 # Create violin plot data frame for Combat
 violin_data_combat <- data.frame(
   Slide = slide_number_combat,
-  Batch = propranolol_data_combat$batch,
-  Value = unlist(propranolol_data_trans_combat[3, ])
+  Batch = QCSdata_combat$batch,
+  Value = unlist(QCSdata_trans_combat[3, ])
 )
 
 # Scale Combat data by its mean
@@ -3115,18 +3115,18 @@ print(violin_plot_combat_jit_d7)
 
 # WaveICA Plot
 # Transform and prepare the dataset for WaveICA
-propranolol_data_trans_wave <- as.data.frame(t(d7_propranolol_data_wave))
-propranolol_data_trans_wave[] <- lapply(propranolol_data_trans_wave, as.numeric)
+QCSdata_trans_wave <- as.data.frame(t(IS_data_wave))
+QCSdata_trans_wave[] <- lapply(QCSdata_trans_wave, as.numeric)
 
 # Extract slide number
-slide_number_wave <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans_wave))
+slide_number_wave <- gsub("^.*S(\\d+)_.*", "\\1", names(QCSdata_trans_wave))
 slide_number_wave <- as.numeric(slide_number_wave)
 
 # Create violin plot data frame for WaveICA
 violin_data_wave <- data.frame(
   Slide = slide_number_wave,
-  Batch = propranolol_data_wave$batch,
-  Value = unlist(propranolol_data_trans_wave[3, ])
+  Batch = QCSdata_wave$batch,
+  Value = unlist(QCSdata_trans_wave[3, ])
 )
 
 # Scale WaveICA data by its mean
@@ -3138,18 +3138,18 @@ print(violin_plot_wave_jit_d7)
 
 # NormAE Plot
 # Transform and prepare the dataset for NormAE
-propranolol_data_trans_norm <- as.data.frame(t(d7_propranolol_data_norm))
-propranolol_data_trans_norm[] <- lapply(propranolol_data_trans_norm, as.numeric)
+QCSdata_trans_norm <- as.data.frame(t(IS_data_norm))
+QCSdata_trans_norm[] <- lapply(QCSdata_trans_norm, as.numeric)
 
 # Extract slide number
-slide_number_norm <- gsub("^.*S(\\d+)_.*", "\\1", names(propranolol_data_trans_norm))
+slide_number_norm <- gsub("^.*S(\\d+)_.*", "\\1", names(QCSdata_trans_norm))
 slide_number_norm <- as.numeric(slide_number_norm)
 
 # Create violin plot data frame for NormAE
 violin_data_norm <- data.frame(
   Slide = slide_number_norm,
-  Batch = propranolol_data_norm$batch,
-  Value = unlist(propranolol_data_trans_norm[3, ])
+  Batch = QCSdata_norm$batch,
+  Value = unlist(QCSdata_trans_norm[3, ])
 )
 
 # Scale NormAE data by its mean
@@ -3163,7 +3163,7 @@ print(violin_plot_norm_jit_d7)
 
 ::: {.cell .r}
 ```{r fig.height=12, fig.width=7, echo=FALSE}
-## Overview Intensity Plot (D7_propranolol) ##
+## Overview Intensity Plot (D7QCS) ##
 library(gridExtra)
 combined_violin_plots_d7 <- grid.arrange(violin_plot_combat_jit_d7, 
                                          violin_plot_wave_jit_d7,
@@ -4371,12 +4371,12 @@ print(combined_plots_interday)
 # Create overview RSD table for Propranolol
 overview_table_pro <- data.frame(
   Row_Names = c("Intraday 1", "Intraday 2", "Intraday 3", "Interday"),
-  No_norm_RSD = rsd_propranolol[2],  
-  TIC_norm_RSD = rsd_propranolol_TIC[2],
+  No_norm_RSD = rsdQCS[2],  
+  TIC_norm_RSD = rsd_QCSTIC[2],
   IS_norm_RSD = rsd_ratio[2],
-  Combat_RSD = rsd_propranolol_combat[2],
-  WaveICA_RSD = rsd_propranolol_wave[2],
-  NormAE_RSD = rsd_propranolol_norm[2]
+  Combat_RSD = rsd_QCScombat[2],
+  WaveICA_RSD = rsd_QCSwave[2],
+  NormAE_RSD = rsd_QCSnorm[2]
 )
 
 # Set the column names
@@ -4399,11 +4399,11 @@ display_html(display_rsd_table_pro)
 # Create overview RSD table for d7-Propranolol
 overview_table_d7_pro <- data.frame(
   Row_Names = c("Intraday 1", "Intraday 2", "Intraday 3", "Interday"),
-  No_norm_RSD = rsd_d7_propranolol[2],
-  TIC_norm_RSD = rsd_d7_propranolol[2],
-  Combat_RSD = rsd_d7_propranolol_combat[2],
-  WaveICA_RSD = rsd_d7_propranolol_wave[2],
-  NormAE_RSD = rsd_d7_propranolol_norm[2]
+  No_norm_RSD = rsd_IS[2],
+  TIC_norm_RSD = rsd_IS[2],
+  Combat_RSD = rsd_IS_combat[2],
+  WaveICA_RSD = rsd_IS_wave[2],
+  NormAE_RSD = rsd_IS_norm[2]
 )
 
 # Set the column names
@@ -4719,12 +4719,12 @@ display_html(display_pair_distance_table)
 # ranking based on QCS interday rsd_value of (propranolol)
 overview_table_pro <- data.frame(
   Row_Names = c("Intraday 1", "Intraday 2", "Intraday 3", "Interday"),
-  No_norm_RSD = rsd_propranolol[2],  
-  TIC_norm_RSD = rsd_propranolol_TIC[2],
+  No_norm_RSD = rsdQCS[2],  
+  TIC_norm_RSD = rsd_QCSTIC[2],
   IS_norm_RSD = rsd_ratio[2],   
-  Combat_RSD = rsd_propranolol_combat[2],
-  WaveICA_RSD = rsd_propranolol_wave[2],
-  NormAE_RSD = rsd_propranolol_norm[2]
+  Combat_RSD = rsd_QCScombat[2],
+  WaveICA_RSD = rsd_QCSwave[2],
+  NormAE_RSD = rsd_QCSnorm[2]
 )
 # Set the column names
 colnames(overview_table_pro) <- c(paste("m/z value:", QCS_mz_value_2), "No Norm", "TIC Norm", "IS Norm", "Combat", "WaveICA", "NormAE")
@@ -4905,7 +4905,7 @@ library(openxlsx)
 # Prompt the user to input the number of batches
 num_batches <- as.integer(readline("Enter the number of batches in your dataset: "))
 
-create_batch_dataset_excel <- function(data, num_batches, propranolol_mz_value, file_name) {
+create_batch_dataset_excel <- function(data, num_batches, QCSmz_value, file_name) {
   library(openxlsx)
   
   # Create a new Excel workbook
@@ -4926,7 +4926,7 @@ create_batch_dataset_excel <- function(data, num_batches, propranolol_mz_value, 
   for (i in 1:num_batches) {
     batch_dataset <- extract_batch_dataset(data, i)
     colnames(batch_dataset) <- sub("^X", "", colnames(batch_dataset))
-    numeric_batch_dataset <- as.numeric(batch_dataset[, colnames(batch_dataset) == propranolol_mz_value, drop = TRUE])
+    numeric_batch_dataset <- as.numeric(batch_dataset[, colnames(batch_dataset) == QCSmz_value, drop = TRUE])
     
     intraday_rsd <- calculate_rsd(numeric_batch_dataset)
     batch_dataset$intraday_rsd <- intraday_rsd
@@ -4937,7 +4937,7 @@ create_batch_dataset_excel <- function(data, num_batches, propranolol_mz_value, 
   }
   
   # Calculate Interday RSD for all data
-  numeric_interday_dataset <- as.numeric(data[, colnames(data) == propranolol_mz_value, drop = TRUE])
+  numeric_interday_dataset <- as.numeric(data[, colnames(data) == QCSmz_value, drop = TRUE])
   interday_rsd <- calculate_rsd(numeric_interday_dataset)
   data$interday_rsd <- interday_rsd
   
@@ -4953,23 +4953,23 @@ create_batch_dataset_excel <- function(data, num_batches, propranolol_mz_value, 
 }
 
 # Example usage:
-if (exists("propranolol_data") && length(propranolol_data) > 0) {
-    create_batch_dataset_excel(propranolol_data, num_batches, QCS_mz_value_2, "NO_Norm_propranolol_batch_dataset")
+if (exists("QCSdata") && length(QCSdata) > 0) {
+    create_batch_dataset_excel(QCSdata, num_batches, QCS_mz_value_2, "NO_Norm_QCSbatch_dataset")
 }
-if (exists("propranolol_data_TIC") && length(propranolol_data_TIC) > 0) {
-    create_batch_dataset_excel(propranolol_data_TIC, num_batches, QCS_mz_value_2, "TIC_Norm_propranolol_batch_dataset")
+if (exists("QCSdata_TIC") && length(QCSdata_TIC) > 0) {
+    create_batch_dataset_excel(QCSdata_TIC, num_batches, QCS_mz_value_2, "TIC_Norm_QCSbatch_dataset")
 }
 if (exists("ratio_data") && length(ratio_data) > 0) {
-    create_batch_dataset_excel(ratio_data, num_batches, "ratio", "IS_Norm_propranolol_batch_dataset")
+    create_batch_dataset_excel(ratio_data, num_batches, "ratio", "IS_Norm_QCSbatch_dataset")
 }
-if (exists("propranolol_data_combat") && length(propranolol_data_combat) > 0) {
-    create_batch_dataset_excel(propranolol_data_combat, num_batches, QCS_mz_value_2, "COMBAT_propranolol_batch_dataset")
+if (exists("QCSdata_combat") && length(QCSdata_combat) > 0) {
+    create_batch_dataset_excel(QCSdata_combat, num_batches, QCS_mz_value_2, "COMBAT_QCSbatch_dataset")
 }
-if (exists("propranolol_data_wave") && length(propranolol_data_wave) > 0) {
-    create_batch_dataset_excel(propranolol_data_wave, num_batches, QCS_mz_value_2, "WAVE_propranolol_batch_dataset")
+if (exists("QCSdata_wave") && length(QCSdata_wave) > 0) {
+    create_batch_dataset_excel(QCSdata_wave, num_batches, QCS_mz_value_2, "WAVE_QCSbatch_dataset")
 }
-if (exists("propranolol_data_norm") && length(propranolol_data_norm) > 0) {
-    create_batch_dataset_excel(propranolol_data_norm, num_batches, QCS_mz_value_2, "NormAE_propranolol_batch_dataset")
+if (exists("QCSdata_norm") && length(QCSdata_norm) > 0) {
+    create_batch_dataset_excel(QCSdata_norm, num_batches, QCS_mz_value_2, "NormAE_QCSbatch_dataset")
 }
 ```
 :::
@@ -5008,8 +5008,8 @@ save_html_table <- function(html_content, file_path) {
 # Saving html tables first #
 
 # Saving QCS RSD html tables in result folder
-save_html_table(display_rsd_table_pro, "Output/propranolol_rsd.html")
-save_html_table(display_rsd_table_d7_pro, "Output/d7_propranolol_rsd.html")
+save_html_table(display_rsd_table_pro, "Output/QCSrsd.html")
+save_html_table(display_rsd_table_d7_pro, "Output/IS_rsd.html")
 
 # Saving Tissue RSD html table in result folder
 save_html_table(centered_combined_html, "Output/tissue_rsd.html")
@@ -5027,11 +5027,11 @@ file_path <- "Output/intensity_plots.png"
 ggsave(file_path, plot = combined_plots_intensity, width = 18, height = 25, dpi = 300)
 
 # Saving the violin plot propranolol to a file
-file_path <- "Output/violin_propranolol_plots.png"
+file_path <- "Output/violin_QCSplots.png"
 ggsave(file_path, plot = combined_plots_violin, width = 18, height = 25, dpi = 300)
 
-# Saving the violin plot d7_propranolol to a file
-file_path <- "Output/violin_d7_propranolol_plots.png"
+# Saving the violin plot IS to a file
+file_path <- "Output/violin_IS_plots.png"
 ggsave(file_path, plot = combined_plots_violin_d7, width = 18, height = 25, dpi = 300)
 
 # Saving the PCA plot to a file
