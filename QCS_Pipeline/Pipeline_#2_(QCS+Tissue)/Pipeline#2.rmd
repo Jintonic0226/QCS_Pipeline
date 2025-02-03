@@ -587,22 +587,21 @@ print(rsd_ratio)
 
 ::: {#rsd_overview .cell .r}
 ```{r}
-## Load required libraries
 library(kableExtra)
-
 ## Create Overview RSD Table
 overview_table_QCS <- data.frame(
-  Batch = c("Intraday 1", "Intraday 2", "Intraday 3", "Interday"),
-  No_Norm_RSD = rsd_QCS[,2],
-  TIC_Norm_RSD = rsd_QCS_TIC[,2],
-  IS_Norm_RSD = rsd_ratio[,2]
+  Batch = rsd_propranolol$Batch,
+  No_Norm_RSD = rsd_propranolol$RSD,
+  TIC_Norm_RSD = rsd_propranolol_TIC$RSD,
+  IS_Norm_RSD = rsd_ratio$RSD
 )
-colnames(overview_table_QCS) <- c("Batch", "No_norm", "TIC_norm", "IS_norm")
+
+num_cols <- ncol(overview_table_QCS)
 
 ## Display the table in R Markdown
 kable(overview_table_QCS, format = "html", row.names = FALSE) %>%
   kable_styling(full_width = FALSE, position = "center") %>%
-  add_header_above(c("Overview RSD Table QCS" = 4))  
+  add_header_above(c("Overview RSD Table QCS" = num_cols)) 
 ```
 :::
 
@@ -610,44 +609,18 @@ kable(overview_table_QCS, format = "html", row.names = FALSE) %>%
 ```{r}
 ## Overview RSD Table ##
 library(kableExtra)
-
 ## Create Overview RSD Table
 overview_table_IS <- data.frame(
-  Batch = c("Intraday 1", "Intraday 2", "Intraday 3", "Interday"),
-  No_Norm_RSD = rsd_QCS[,2],
-  TIC_Norm_RSD = rsd_QCS_TIC[,2],
-  IS_Norm_RSD = rsd_ratio[,2]
-)
-colnames(overview_table_QCS) <- c("Batch", "No_norm", "TIC_norm", "IS_norm")
-
-
-## Display the table in R Markdown
-kable(overview_table_QCS, format = "html", row.names = FALSE) %>%
-  kable_styling(full_width = FALSE, position = "center") %>%
-  add_header_above(c("Overview RSD Table QCS" = 4))  
-
-## Overview RSD Table ##
-library(kableExtra)
-library(IRdisplay)
-
-# Dynamically create the overview table
-overview_table_IS <- data.frame(
-  Row_Names = rsd_IS$Batch,
+  Batch = rsd_IS$Batch,
   No_Norm_RSD = rsd_IS$RSD,
   TIC_Norm_RSD = rsd_IS_TIC$RSD
 )
+num_cols <- ncol(overview_table_IS)
 
-# Displaying RSD table
-display_rsd_table_IS <- kable(overview_table_IS, format = "html", row.names = FALSE) %>%
-  kable_styling(full_width = FALSE)
-
-# Add table name
-display_rsd_table_IS <- paste("<h2 style='text-align: center;'>Overview RSD Table Internal Standard</h2>", 
-                               as.character(display_rsd_table_IS))
-
-# Set the column names dynamically
-colnames(overview_table_IS) <- c("Batch", "No_norm", "TIC_norm")
-print(overview_table_IS)
+## Display the table in R Markdown
+kable(overview_table_IS, format = "html", row.names = FALSE) %>%
+  kable_styling(full_width = FALSE, position = "center") %>%
+  add_header_above(c("Overview RSD Table IS" = num_cols)) 
 ```
 :::
 
@@ -1243,8 +1216,8 @@ color_mapping <- c("QCS" = "black", setNames(color_palette, unique_types))
 
 # PCA plot
 plot <- ggplot(pca_data, aes(x = PC1, y = PC2, color = Type, label = Sample)) +
-  geom_point(size = 5) +
-  geom_text(hjust = 1.5, vjust = 1.5, size = 8, check_overlap = TRUE, show.legend = FALSE) +
+  geom_point(size = 3) +
+  geom_text(hjust = 1.5, vjust = 1.5, size = 5, check_overlap = TRUE, show.legend = FALSE) +
   xlab(paste("PC1 - ", round(batch_pca$sdev[1]^2 / sum(batch_pca$sdev^2) * 100, 2), "% Variance")) +
   ylab(paste("PC2 - ", round(batch_pca$sdev[2]^2 / sum(batch_pca$sdev^2) * 100, 2), "% Variance")) +
   ggtitle("No Normalization Data") +
@@ -1255,9 +1228,9 @@ plot <- ggplot(pca_data, aes(x = PC1, y = PC2, color = Type, label = Sample)) +
     legend.position = "right",
     legend.title = element_text(size = 10, face = 'bold'),
     legend.text = element_text(size = 10),
-    axis.text = element_text(size = 25, face = 'bold'), 
-    axis.title = element_text(size = 25, face = 'bold'),
-    plot.title = element_text(size = 40, hjust = 0.5, face = 'bold')
+    axis.text = element_text(size = 15, face = 'bold'), 
+    axis.title = element_text(size = 15, face = 'bold'),
+    plot.title = element_text(size = 25, hjust = 0.5, face = 'bold')
   )
 print(plot)
 ```
@@ -1326,8 +1299,8 @@ color_mapping <- c("QCS" = "black", setNames(color_palette, unique_types))
 
 # PCA plot
 plot_TIC <- ggplot(pca_data_TIC, aes(x = PC1, y = PC2, color = Type, label = Sample)) +
-  geom_point(size = 5) +
-  geom_text(hjust = 1.5, vjust = 1.5, size = 8, check_overlap = TRUE, show.legend = FALSE) +
+  geom_point(size = 3) +
+  geom_text(hjust = 1.5, vjust = 1.5, size = 5, check_overlap = TRUE, show.legend = FALSE) +
   xlab(paste("PC1 - ", round(batch_pca_TIC$sdev[1]^2 / sum(batch_pca_TIC$sdev^2) * 100, 2), "% Variance")) +
   ylab(paste("PC2 - ", round(batch_pca_TIC$sdev[2]^2 / sum(batch_pca_TIC$sdev^2) * 100, 2), "% Variance")) +
   ggtitle("TIC Normalization Data") +
@@ -1338,9 +1311,9 @@ plot_TIC <- ggplot(pca_data_TIC, aes(x = PC1, y = PC2, color = Type, label = Sam
     legend.position = "right",
     legend.title = element_text(size = 10, face = 'bold'),
     legend.text = element_text(size = 10),
-    axis.text = element_text(size = 25, face = 'bold'), 
-    axis.title = element_text(size = 25, face = 'bold'),
-    plot.title = element_text(size = 40, hjust = 0.5, face = 'bold')
+    axis.text = element_text(size = 15, face = 'bold'), 
+    axis.title = element_text(size = 15, face = 'bold'),
+    plot.title = element_text(size = 25, hjust = 0.5, face = 'bold')
   ) 
 print(plot_TIC)
 ```
@@ -1424,15 +1397,15 @@ average_distance_ec <- mean(distance_from_centroid)
 
 # Plot PCA plot with QCS samples and their centroid
 pca_plot_qcs <- ggplot(qcs_data, aes(x = PC1, y = PC2, color = Batch)) +
-  geom_point(size = 7) +  # Plot QCS samples with color based on batch number
-  geom_point(data = data.frame(PC1 = qcs_centroid[1], PC2 = qcs_centroid[2]), aes(x = PC1, y = PC2), shape = 17, fill = "black", color = "black", size = 5) +  # Plot centroid as triangle with filled red color
+  geom_point(size = 3) +  # Plot QCS samples with color based on batch number
+  geom_point(data = data.frame(PC1 = qcs_centroid[1], PC2 = qcs_centroid[2]), aes(x = PC1, y = PC2), shape = 17, fill = "black", color = "black", size = 3) +  # Plot centroid as triangle with filled red color
   labs(x = paste("PC1 (", pc1_variance, "% Variance)"), y = paste("PC2 (", pc2_variance, "% Variance)"), title = "No Normalization Data (QCS)") +
   theme_bw() +
-  theme(axis.title.x = element_text(face = "bold", size = 15),
-        axis.title.y = element_text(face = "bold", size = 15),
+  theme(axis.title.x = element_text(face = "bold", size = 10),
+        axis.title.y = element_text(face = "bold", size = 10),
         axis.text = element_text(size = 15, face = "bold"),
         plot.margin = margin(20, 50, 10, 50),  
-        plot.title = element_text(face = "bold", size = 20))
+        plot.title = element_text(face = "bold", size = 15))
 
 # Creating data frame for average distance
 average_distance_qcs_df <- data.frame(
@@ -1441,7 +1414,7 @@ average_distance_qcs_df <- data.frame(
     )
     
 # Create a table plot
-table_plot_qcs <- tableGrob(average_distance_qcs_df, theme = ttheme_minimal(base_size = 20), rows = NULL)
+table_plot_qcs <- tableGrob(average_distance_qcs_df, theme = ttheme_minimal(base_size = 10), rows = NULL)
 
 # Combine the PCA plot and the table
 combined_plot_qcs <- plot_grid(pca_plot_qcs, table_plot_qcs, ncol = 1, align = "v", axis = "lr", rel_heights = c(3, 1))
@@ -1503,15 +1476,15 @@ average_distance_ec_TIC <- mean(distance_from_centroid)
 
 # Plot PCA plot with QCS samples and their centroid
 pca_plot_qcs <- ggplot(qcs_data, aes(x = PC1, y = PC2, color = Batch)) +
-  geom_point(size = 7) +  # Plot QCS samples with color based on batch number
-  geom_point(data = data.frame(PC1 = qcs_centroid[1], PC2 = qcs_centroid[2]), aes(x = PC1, y = PC2), shape = 17, fill = "black", color = "black", size = 5) +  # Plot centroid as triangle with filled red color
+  geom_point(size = 3) +  # Plot QCS samples with color based on batch number
+  geom_point(data = data.frame(PC1 = qcs_centroid[1], PC2 = qcs_centroid[2]), aes(x = PC1, y = PC2), shape = 17, fill = "black", color = "black", size = 3) +  # Plot centroid as triangle with filled red color
   labs(x = paste("PC1 (", pc1_variance, "% Variance)"), y = paste("PC2 (", pc2_variance, "% Variance)"), title = "TIC Normalization Data (QCS)") +
   theme_bw() +
-  theme(axis.title.x = element_text(face = "bold", size = 15),
-        axis.title.y = element_text(face = "bold", size = 15),
+  theme(axis.title.x = element_text(face = "bold", size = 10),
+        axis.title.y = element_text(face = "bold", size = 10),
         axis.text = element_text(size = 15, face = "bold"),
         plot.margin = margin(20, 50, 10, 50),  
-        plot.title = element_text(face = "bold", size = 20))
+        plot.title = element_text(face = "bold", size = 15))
 
 # Creating data frame for average distance
 average_distance_TIC_qcs_df <- data.frame(
@@ -1520,7 +1493,7 @@ average_distance_TIC_qcs_df <- data.frame(
     )
     
 # Create a table plot
-table_plot_qcs <- tableGrob(average_distance_TIC_qcs_df, theme = ttheme_minimal(base_size = 20), rows = NULL)
+table_plot_qcs <- tableGrob(average_distance_TIC_qcs_df, theme = ttheme_minimal(base_size = 10), rows = NULL)
 
 # Combine the PCA plot and the table
 combined_plot_TIC_qcs <- plot_grid(pca_plot_qcs, table_plot_qcs, ncol = 1, align = "v", axis = "lr", rel_heights = c(3, 1))
@@ -1830,7 +1803,7 @@ tissue_avg_distances <- tissue_pca_data_with_centroids %>%
 
 # Create intragroup pca plot with distance lines for visual validation
 tissue_intra_plot <- ggplot(tissue_pca_data_with_centroids, aes(x = PC1, y = PC2, color = Type)) +
-  geom_point(size = 5) +
+  geom_point(size = 3) +
   geom_point(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, color = Type), shape = 18, size = 5) +
   geom_segment(aes(x = PC1, y = PC2, xend = Centroid_PC1, yend = Centroid_PC2), linetype = "dashed") +
   geom_text_repel(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, label = Type), 
@@ -1840,9 +1813,9 @@ tissue_intra_plot <- ggplot(tissue_pca_data_with_centroids, aes(x = PC1, y = PC2
        x = paste("PC1 - ", round(batch_pca$sdev[1]^2 / sum(batch_pca$sdev^2) * 100, 2), "% Variance"),
        y = paste("PC2 - ", round(batch_pca$sdev[2]^2 / sum(batch_pca$sdev^2) * 100, 2), "% Variance")) +
   theme_bw() +
-  theme(axis.text = element_text(size = 20, face = 'bold'), 
-        axis.title = element_text(size = 20, face = 'bold'),
-        plot.title = element_text(size = 25, hjust = 0.5, face = 'bold'),
+  theme(axis.text = element_text(size = 10, face = 'bold'), 
+        axis.title = element_text(size = 10, face = 'bold'),
+        plot.title = element_text(size = 15, hjust = 0.5, face = 'bold'),
         legend.position = "right")
 
 # Create table plot
@@ -1890,7 +1863,7 @@ tissue_avg_distances_TIC <- tissue_pca_data_with_centroids %>%
 
 # Create intragroup PCA plot with distance lines for visual validation
 tissue_intra_plot_TIC <- ggplot(tissue_pca_data_with_centroids, aes(x = PC1, y = PC2, color = Type)) +
-  geom_point(size = 5) +
+  geom_point(size = 3) +
   geom_point(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, color = Type), shape = 18, size = 5) +
   geom_segment(aes(x = PC1, y = PC2, xend = Centroid_PC1, yend = Centroid_PC2), linetype = "dashed") +
   geom_text_repel(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, label = Type), 
@@ -1900,9 +1873,9 @@ tissue_intra_plot_TIC <- ggplot(tissue_pca_data_with_centroids, aes(x = PC1, y =
        x = paste("PC1 - ", round(batch_pca_TIC$sdev[1]^2 / sum(batch_pca_TIC$sdev^2) * 100, 2), "% Variance"),
        y = paste("PC2 - ", round(batch_pca_TIC$sdev[2]^2 / sum(batch_pca_TIC$sdev^2) * 100, 2), "% Variance")) +
   theme_bw() +
-  theme(axis.text = element_text(size = 20, face = 'bold'), 
-        axis.title = element_text(size = 20, face = 'bold'),
-        plot.title = element_text(size = 25, hjust = 0.5, face = 'bold'),
+  theme(axis.text = element_text(size = 10, face = 'bold'), 
+        axis.title = element_text(size = 10, face = 'bold'),
+        plot.title = element_text(size = 15, hjust = 0.5, face = 'bold'),
         legend.position = "right")
 
 # Create table plot
