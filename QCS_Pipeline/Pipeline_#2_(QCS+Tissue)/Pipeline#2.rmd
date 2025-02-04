@@ -1813,13 +1813,15 @@ tissue_intra_plot <- ggplot(tissue_pca_data_with_centroids, aes(x = PC1, y = PC2
        x = paste("PC1 - ", round(batch_pca$sdev[1]^2 / sum(batch_pca$sdev^2) * 100, 2), "% Variance"),
        y = paste("PC2 - ", round(batch_pca$sdev[2]^2 / sum(batch_pca$sdev^2) * 100, 2), "% Variance")) +
   theme_bw() +
-  theme(axis.text = element_text(size = 10, face = 'bold'), 
-        axis.title = element_text(size = 10, face = 'bold'),
-        plot.title = element_text(size = 15, hjust = 0.5, face = 'bold'),
-        legend.position = "right")
+  theme(axis.text = element_text(size = 10, face = "bold"), 
+        axis.title = element_text(size = 10, face = "bold"),
+        plot.title = element_text(size = 15, hjust = 0.5, face = "bold"),
+        legend.position = "right",
+        legend.text = element_text(size = 8, face = "bold"),
+        legend.key.size = unit(1.5, "lines"))
 
 # Create table plot
-table_plot <- tableGrob(tissue_avg_distances, rows = NULL)
+table_plot <- tableGrob(tissue_avg_distances, theme = ttheme_default(base_size = 10))
 
 # Arrange PCA plot and table plot
 combined_plot_intra <- grid.arrange(tissue_intra_plot, table_plot, ncol = 1, heights = c(3, 1))
@@ -1876,10 +1878,14 @@ tissue_intra_plot_TIC <- ggplot(tissue_pca_data_with_centroids, aes(x = PC1, y =
   theme(axis.text = element_text(size = 10, face = 'bold'), 
         axis.title = element_text(size = 10, face = 'bold'),
         plot.title = element_text(size = 15, hjust = 0.5, face = 'bold'),
-        legend.position = "right")
+        legend.position = "right",
+        legend.text = element_text(size = 8),
+        legend.title = element_text(size = 8, face = "bold"),
+        legend.key.size = unit(1.5, "lines")
+        )
 
 # Create table plot
-table_plot <- tableGrob(tissue_avg_distances_TIC, rows = NULL)
+table_plot <- tableGrob(tissue_avg_distances_TIC, theme = ttheme_default(base_size = 8))
 
 # Arrange PCA plot and table plot
 combined_plot_TIC_intra <- grid.arrange(tissue_intra_plot_TIC, table_plot, ncol = 1, heights = c(3, 1))
@@ -1891,12 +1897,12 @@ print(combined_plot_TIC_intra)
 :::
 
 ::: {#tissue_pca5 .cell .r}
-```{r}
+```{r, fig.height=10, fig.width=7}
 ## Overview PCA plot ##
 library(gridExtra)
 combined_plots <- grid.arrange(combined_plot_intra,
                                combined_plot_TIC_intra,
-                               nrow = 1)
+                               nrow = 2)
 print(combined_plots)
 ```
 :::
@@ -1917,7 +1923,7 @@ the data quality. It is measured like the equation below.
 :::
 ::::
 
-::: {.cell .r}
+::: {#intergroup .cell .r}
 ```{r}
 ## Intergroup Tissue PCA Plot ##
 # No Norm #
@@ -1959,8 +1965,8 @@ for (i in 1:ncol(tissue_combinations)) {
 
 # Create the Tissue PCA Plot
 tissue_intergroup_plot <- ggplot(tissue_pca_data, aes(x = PC1, y = PC2, color = Type)) +
-  geom_point(size = 5) +
-  geom_point(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, color = Type), shape = 18, size = 5) +
+  geom_point(size = 3) +
+  geom_point(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, color = Type), shape = 18, size = 3) +
   geom_text_repel(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, label = Type), 
                   direction = "both", size = 3) +  
   geom_text_repel(aes(label = Sample), direction = "both", size = 3) +  
@@ -1968,13 +1974,13 @@ tissue_intergroup_plot <- ggplot(tissue_pca_data, aes(x = PC1, y = PC2, color = 
        x = paste("PC1 - ", round(batch_pca$sdev[1]^2 / sum(batch_pca$sdev^2) * 100, 2), "% Variance"),
        y = paste("PC2 - ", round(batch_pca$sdev[2]^2 / sum(batch_pca$sdev^2) * 100, 2), "% Variance")) +
   theme_bw() +
-  theme(axis.text = element_text(size = 20, face = 'bold'), 
-        axis.title = element_text(size = 20, face = 'bold'),
-        plot.title = element_text(size = 25, hjust = 0.5, face = 'bold'),
+  theme(axis.text = element_text(size = 10, face = 'bold'), 
+        axis.title = element_text(size = 10, face = 'bold'),
+        plot.title = element_text(size = 15, hjust = 0.5, face = 'bold'),
         legend.position = "right")
 
 # Create a table grob for centroid distances
-centroid_table <- tableGrob(centroid_distances_df, rows = NULL)
+centroid_table <- tableGrob(centroid_distances_df, theme = ttheme_default(base_size = 8))
 
 # Arrange plots and table vertically
 combined_plot_inter <- grid.arrange(tissue_intergroup_plot, centroid_table, ncol = 1, heights = c(3, 1))
@@ -2026,8 +2032,8 @@ for (i in 1:ncol(tissue_combinations)) {
 
 # Create the tissue plot
 tissue_intergroup_plot_TIC <- ggplot(tissue_pca_data, aes(x = PC1, y = PC2, color = Type)) +
-  geom_point(size = 5) +
-  geom_point(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, color = Type), shape = 18, size = 5) +
+  geom_point(size = 3) +
+  geom_point(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, color = Type), shape = 18, size = 3) +
   geom_text_repel(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, label = Type), 
                   direction = "both", size = 3) +  
   geom_text_repel(aes(label = Sample), direction = "both", size = 3) +  
@@ -2035,13 +2041,13 @@ tissue_intergroup_plot_TIC <- ggplot(tissue_pca_data, aes(x = PC1, y = PC2, colo
        x = paste("PC1 - ", round(batch_pca_TIC$sdev[1]^2 / sum(batch_pca_TIC$sdev^2) * 100, 2), "% Variance"),
        y = paste("PC2 - ", round(batch_pca_TIC$sdev[2]^2 / sum(batch_pca_TIC$sdev^2) * 100, 2), "% Variance")) +
   theme_bw() +
-  theme(axis.text = element_text(size = 20, face = 'bold'), 
-        axis.title = element_text(size = 20, face = 'bold'),
-        plot.title = element_text(size = 25, hjust = 0.5, face = 'bold'),
+  theme(axis.text = element_text(size = 10, face = 'bold'), 
+        axis.title = element_text(size = 10, face = 'bold'),
+        plot.title = element_text(size = 15, hjust = 0.5, face = 'bold'),
         legend.position = "right")
 
 # Create a table grob for centroid distances
-centroid_table_TIC <- tableGrob(centroid_distances_df_TIC, rows = NULL)
+centroid_table_TIC <- tableGrob(centroid_distances_df_TIC, theme = ttheme_default(base_size = 8))
 
 # Arrange plots and table vertically
 combined_plot_TIC_inter <- grid.arrange(tissue_intergroup_plot_TIC, centroid_table_TIC, ncol = 1, heights = c(3, 1))
@@ -2051,14 +2057,13 @@ print(combined_plot_TIC_inter)
 ```
 :::
 
-::: {.cell .markdown}
-```{r}
+::: {#intergroup2 .cell .markdown}
+```{r, fig.height=10, fig.width=7}
 ## Overview PCA plot ##
 library(gridExtra)
 combined_plots <- grid.arrange(combined_plot_inter,
                                combined_plot_TIC_inter,
-                               nrow = 1,
-                               heights = c(1,1)
+                               nrow = 2
                                )
 print(combined_plots)
 ```
@@ -2076,7 +2081,7 @@ Now, we will correct the batch effect using these packages.
     <https://github.com/luyiyun/NormAE>
 
 For more Batch Effect Correction try this site:
-<https://www.metaboanalyst.ca/MetaboAnalyst/upload/BatchUpload.xhtml>
+<https://www.metaboanalyst.ca/MetaboAnnoalyst/upload/BatchUpload.xhtml>
 :::
 
 :::: {#choosingdata .cell .r}
@@ -2121,10 +2126,12 @@ if (tolower(check_dataset) == "yes") {
 
 :::
 
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: {#combat .cell .r}
-::: {.cell .markdown}
-## 1. Combat {#combat_2}
 
+::: {#combat .cell .markdown}
+## 1. Combat {#combat_2}
+:::
+
+::: {#combat2 .cell .r}
 ```{r}
 # Installing sva package 3 ways: normal, remote, bioconductor
 
@@ -2204,11 +2211,12 @@ cat("\033[1mCombat is successfully completed. Check the result in dataset folder
 ```
 :::
 
-:::: {#waveica .cell .r}
-::: {.cell .markdown}
+
+::: {#waveica .cell .markdown}
 ## 2. WaveICA {#waveica_2}
 :::
 
+:::: {#waveica2 .cell .r}
 ```{r}
 # Installing WaveICA in 3 ways: normal, remote, bioconductor
 # Try installing using remotes (GitHub)
@@ -2299,14 +2307,15 @@ cat("\033[1mWaveICA is successfully completed. Check the result in dataset folde
 ```
 :::
 
-:::: {#normae.cell .r}
+
 ::: {#normae .cell .markdown}
 ## 3. NormAE {#normae_2}
 
-**(This will only prepare dataset, you will need to run NormAE
-externally)**
+** (This will only prepare dataset, you will need to run NormAE
+externally) **
 :::
 
+:::: {#normae2 .cell .r}
 ```{r}
 ## NormAE ##
 # load libraries
@@ -2368,7 +2377,7 @@ cat("\033[1mPlease go to https://github.com/luyiyun/NormAE and run NormAE and pu
 ```
 ::::
 
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: {#settingnormaedataset .cell .markdown}
+::: {#settingnormaedataset .cell .markdown}
 # Here requires yours input/changes
 
 **Please enter a correct csv file path accordingly whether it is no
@@ -2392,7 +2401,7 @@ cat("\033[1mData preparation of NormAE is successfully completed. Check the resu
 ```
 :::
 
-::: {.cell .markdown}
+::: {#correction .cell .markdown}
 ##Correction_Results{#correction_results_2}
 
 1.  [QCS_RSD](#corr_qcs_rsd_2)
@@ -2552,7 +2561,7 @@ print(rsd_IS_wave)
 ```
 :::
 
-::: {.cell .r}
+::: {#qcs_rsd_corr .cell .r}
 ```{r}
 ## QCS RSD Table ## 
 # NormAE #
@@ -2599,12 +2608,10 @@ print(rsd_IS_norm)
 
 ::: {#corr_QCS_rsd4 .cell .r}
 ```{r}
-## RSD Overview Table ##
+# Load necessary libraries
 library(kableExtra)
-library(htmltools)
-library(IRdisplay)
 
-# propranolol #
+# Create overview table for Propranolol
 overview_table_QCS <- data.frame(
   Row_Names = c("Intraday 1", "Intraday 2", "Intraday 3", "Interday"),
   Combat_RSD = rsd_QCS_combat[2],
@@ -2612,21 +2619,15 @@ overview_table_QCS <- data.frame(
   NormAE_RSD = rsd_QCS_norm[2]
 )
 
-# Set the column names
+# Set column names
 colnames(overview_table_QCS) <- c(paste("m/z value:", QCS_mz_value_2), "Combat", "WaveICA", "NormAE")
 
-# Displaying overview RSD table
-display_rsd_table_QCS <- kable(overview_table_QCS, format = "html", row.names = FALSE) %>%
+# Display table with title
+cat("## Overview RSD Table QCS\n")
+kable(overview_table_QCS, format = "html") %>%
   kable_styling(full_width = FALSE)
 
-# Add table name
-display_rsd_table_QCS <- paste("<h2 style='text-align: center;'>Overview RSD Table QCS</h2>", 
-                               as.character(display_rsd_table_QCS))
-
-# Save HTML table to a file
-print(display_rsd_table_QCS)
-
-# D7-propranolol # 
+# Create overview table for D7-Propranolol
 overview_table_IS <- data.frame(
   Row_Names = c("Intraday 1", "Intraday 2", "Intraday 3", "Interday"),
   Combat_RSD = rsd_IS_combat[2],
@@ -2634,28 +2635,22 @@ overview_table_IS <- data.frame(
   NormAE_RSD = rsd_IS_norm[2]
 )
 
-# Set the column names
+# Set column names
 colnames(overview_table_IS) <- c(paste("m/z value:", IS_mz_value_2), "Combat", "WaveICA", "NormAE")
 
-
-# Displaying overview RSD table
-display_rsd_table_IS <- kable(overview_table_IS, format = "html", row.names = FALSE) %>%
+# Display table with title
+cat("## Overview RSD Table Internal Standard\n")
+kable(overview_table_IS, format = "html") %>%
   kable_styling(full_width = FALSE)
 
-# Add table name
-display_rsd_table_IS <- paste("<h2 style='text-align: center;'>Overview RSD Table Internal Standard</h2>", 
-                               as.character(display_rsd_table_IS))
-
-# Save HTML table to a file
-print(display_rsd_table_IS)
 ```
 :::
 
 ::: {#corr_intensity .cell .markdown}
-## 2. Intensity Plot {@intensity_plot_2}
+## 2. Intensity Plot {#intensity_plot_2}
 :::
 
-::: {.cell .r}
+::: {#corr_intensity2 .cell .r}
 ```{r}
 ## Intensity Plot (Intensity vs Measurement Order ##
 
@@ -2706,7 +2701,7 @@ options(repr.plot.width = 10, repr.plot.height = 6) # adjust the intensity plot 
 # intensity plot with mean and standard deviation lines
 library(ggplot2)
 intensity_plot_combat <- ggplot(plot_data_scaled, aes(x = Measurement_order, y = Intensity, color = factor(Batch))) +
-  geom_point(size = 5) +  
+  geom_point(size = 3) +  
   geom_line(aes(group = Batch), alpha = 0.5) + 
   geom_hline(yintercept = mean_intensity, linetype = "dotted", color = "red", linewidth = 1) +  
   geom_hline(yintercept = mean_intensity + sd_intensity, linetype = "dotted", color = "black", linewidth = 1) +  # Add gray dotted line for mean + standard deviation
@@ -2716,11 +2711,11 @@ intensity_plot_combat <- ggplot(plot_data_scaled, aes(x = Measurement_order, y =
   scale_color_manual(values = c("1" = "red", "2" = "green", "3" = "blue")) +  
   ggtitle("Combat") +
   theme(
-    plot.title = element_text(size = 40, hjust = 0.5, face = "bold"), 
-    axis.title.x = element_text(size = 25, face = "bold"), 
-    axis.title.y = element_text(size = 25, face = "bold"),  
-    axis.text.x = element_text(size = 15, face = "bold"),  
-    axis.text.y = element_text(size = 20, face = "bold")  
+    plot.title = element_text(size = 20, hjust = 0.5, face = "bold"), 
+    axis.title.x = element_text(size = 15, face = "bold"), 
+    axis.title.y = element_text(size = 15, face = "bold"),  
+    axis.text.x = element_text(size = 10, face = "bold"),  
+    axis.text.y = element_text(size = 10, face = "bold")  
   )
 print(intensity_plot_combat)
 
@@ -2771,7 +2766,7 @@ options(repr.plot.width = 10, repr.plot.height = 6)  # Adjust width and height a
 # intensity plot with mean and standard deviation lines
 library(ggplot2)
 intensity_plot_wave <- ggplot(plot_data_scaled, aes(x = Measurement_order, y = Intensity, color = factor(Batch))) +
-  geom_point(size = 5) + 
+  geom_point(size = 3) + 
   geom_line(aes(group = Batch), alpha = 0.5) + 
   geom_hline(yintercept = mean_intensity, linetype = "dotted", color = "red", linewidth = 1) +  # Add black dotted line for mean
   geom_hline(yintercept = mean_intensity + sd_intensity, linetype = "dotted", color = "black", linewidth = 1) +  # Add gray dotted line for mean + standard deviation
@@ -2781,11 +2776,11 @@ intensity_plot_wave <- ggplot(plot_data_scaled, aes(x = Measurement_order, y = I
   scale_color_manual(values = c("1" = "red", "2" = "green", "3" = "blue")) +  
   ggtitle("WaveICA") +
   theme(
-    plot.title = element_text(size = 40, hjust = 0.5, face = "bold"),  
-    axis.title.x = element_text(size = 25, face = "bold"),  
-    axis.title.y = element_text(size = 25, face = "bold"),  
-    axis.text.x = element_text(size = 15, face = "bold"),  
-    axis.text.y = element_text(size = 20, face = "bold") 
+    plot.title = element_text(size = 20, hjust = 0.5, face = "bold"),  
+    axis.title.x = element_text(size = 15, face = "bold"),  
+    axis.title.y = element_text(size = 15, face = "bold"),  
+    axis.text.x = element_text(size = 10, face = "bold"),  
+    axis.text.y = element_text(size = 10, face = "bold") 
   )
 print(intensity_plot_wave)
 
@@ -2839,7 +2834,7 @@ options(repr.plot.width = 10, repr.plot.height = 6)  # Adjust width and height a
 # intensity plot with mean and standard deviation lines
 library(ggplot2)
 intensity_plot_norm <- ggplot(plot_data_scaled, aes(x = Measurement_order, y = Intensity, color = factor(Batch))) +
-  geom_point(size = 5) +  # color = batch
+  geom_point(size = 3) +  # color = batch
   geom_line(aes(group = Batch), alpha = 0.5) + 
   geom_hline(yintercept = mean_intensity, linetype = "dotted", color = "red", linewidth = 1) + 
   geom_hline(yintercept = mean_intensity + sd_intensity, linetype = "dotted", color = "black", linewidth = 1) +  # Add gray dotted line for mean + standard deviation
@@ -2849,11 +2844,11 @@ intensity_plot_norm <- ggplot(plot_data_scaled, aes(x = Measurement_order, y = I
   scale_color_manual(values = c("1" = "red", "2" = "green", "3" = "blue")) +  
   ggtitle("NormAE") +
   theme(
-    plot.title = element_text(size = 40, hjust = 0.5, face = "bold"), 
-    axis.title.x = element_text(size = 25, face = "bold"), 
-    axis.title.y = element_text(size = 25, face = "bold"), 
-    axis.text.x = element_text(size = 15, face = "bold"),  
-    axis.text.y = element_text(size = 20, face = "bold")  
+    plot.title = element_text(size = 20, hjust = 0.5, face = "bold"), 
+    axis.title.x = element_text(size = 15, face = "bold"), 
+    axis.title.y = element_text(size = 15, face = "bold"), 
+    axis.text.x = element_text(size = 10, face = "bold"),  
+    axis.text.y = element_text(size = 10, face = "bold")  
   )
 print(intensity_plot_norm)
 ```
@@ -2876,7 +2871,7 @@ print(combined_intensity_plots)
 ## 3. Violin Plot {#corr_qcs_violin_2}
 :::
 
-::: {.cell .r}
+::: {#corr_violinplot .cell .r}
 ```{r}
 # Load required libraries
 library(ggplot2)
@@ -2936,11 +2931,11 @@ plot_violin <- function(data, title) {
     labs(x = "Slide Number", y = "Scaled Peak Data", title = title) +
     theme_bw() +
     theme(
-      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, face = "bold", size = 25),
-      axis.text.y = element_text(angle = 90, vjust = 0.5, hjust = 1, face = "bold", size = 25),
-      axis.title = element_text(face = "bold", size = 25),  
-      plot.title = element_text(face = "bold", size = 35),  
-      axis.text = element_text(size = 20)
+      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, face = "bold", size = 10),
+      axis.text.y = element_text(angle = 90, vjust = 0.5, hjust = 1, face = "bold", size = 10),
+      axis.title = element_text(face = "bold", size = 15),  
+      plot.title = element_text(face = "bold", size = 20),  
+      axis.text = element_text(size = 10)
     )
 }
 
@@ -3054,11 +3049,11 @@ plot_violin <- function(data, title) {
     labs(x = "Slide Number", y = "Scaled Peak Data", title = title) +
     theme_bw() +
     theme(
-      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, face = "bold", size = 25),
-      axis.text.y = element_text(angle = 90, vjust = 0.5, hjust = 1, face = "bold", size = 25),
-      axis.title = element_text(face = "bold", size = 25),  
-      plot.title = element_text(face = "bold", size = 35),  
-      axis.text = element_text(size = 20)
+      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, face = "bold", size = 10),
+      axis.text.y = element_text(angle = 90, vjust = 0.5, hjust = 1, face = "bold", size = 10),
+      axis.title = element_text(face = "bold", size = 15),  
+      plot.title = element_text(face = "bold", size = 20),  
+      axis.text = element_text(size = 10)
     )
 }
 
@@ -3151,7 +3146,7 @@ print(combined_violin_plots_d7)
 ## 4. PCA Plot {#corr_pca_2}
 :::
 
-::: r
+::: {#corr_pca_plot2 .cell .r}
 ```{r}
 ## PCA plot ##
 library(stringr)
@@ -3204,7 +3199,7 @@ color_mapping <- c("QCS" = "black", setNames(color_palette, unique_types))
 pca_data_combat$Type <- sample_types_combat
 
 plot_combat <- ggplot(pca_data_combat, aes(x = PC1, y = PC2, color = Type, label = Sample)) +
-  geom_point(size = 5) +
+  geom_point(size = 3) +
   geom_text(hjust = 1.5, vjust = 1.5, size = 8, check_overlap = TRUE, show.legend = FALSE) +
   xlab(paste("PC1 - ", round(batch_pca_combat$sdev[1]^2 / sum(batch_pca_combat$sdev^2) * 100, 2), "% Variance")) +
   ylab(paste("PC2 - ", round(batch_pca_combat$sdev[2]^2 / sum(batch_pca_combat$sdev^2) * 100, 2), "% Variance")) +
@@ -3216,15 +3211,15 @@ plot_combat <- ggplot(pca_data_combat, aes(x = PC1, y = PC2, color = Type, label
     legend.position = "right",
     legend.title = element_text(size = 10, face = 'bold'),
     legend.text = element_text(size = 10),
-    axis.text = element_text(size = 25, face = 'bold'), 
-    axis.title = element_text(size = 25, face = 'bold'),
-    plot.title = element_text(size = 40, hjust = 0.5, face = 'bold')
+    axis.text = element_text(size = 15, face = 'bold'), 
+    axis.title = element_text(size = 15, face = 'bold'),
+    plot.title = element_text(size = 20, hjust = 0.5, face = 'bold')
   )
 print(plot_combat)
 ```
 :::
 
-::: r
+::: {#corr_pca_plot3 .cell .r}
 ```{r}
 ## PCA plot ##
 library(stringr)
@@ -3277,7 +3272,7 @@ color_mapping <- c("QCS" = "black", setNames(color_palette, unique_types))
 pca_data_wave$Type <- sample_types_wave
 
 plot_wave <- ggplot(pca_data_wave, aes(x = PC1, y = PC2, color = Type, label = Sample)) +
-  geom_point(size = 5) +
+  geom_point(size = 3) +
   geom_text(hjust = 1.5, vjust = 1.5, size = 8, check_overlap = TRUE, show.legend = FALSE) +
   xlab(paste("PC1 - ", round(batch_pca_wave$sdev[1]^2 / sum(batch_pca_wave$sdev^2) * 100, 2), "% Variance")) +
   ylab(paste("PC2 - ", round(batch_pca_wave$sdev[2]^2 / sum(batch_pca_wave$sdev^2) * 100, 2), "% Variance")) +
@@ -3289,9 +3284,9 @@ plot_wave <- ggplot(pca_data_wave, aes(x = PC1, y = PC2, color = Type, label = S
     legend.position = "right",
     legend.title = element_text(size = 10, face = 'bold'),
     legend.text = element_text(size = 10),
-    axis.text = element_text(size = 25, face = 'bold'), 
-    axis.title = element_text(size = 25, face = 'bold'),
-    plot.title = element_text(size = 40, hjust = 0.5, face = 'bold')
+    axis.text = element_text(size = 15, face = 'bold'), 
+    axis.title = element_text(size = 15, face = 'bold'),
+    plot.title = element_text(size = 20, hjust = 0.5, face = 'bold')
   )
 print(plot_wave)
 ```
@@ -3349,7 +3344,7 @@ color_mapping <- c("QCS" = "black", setNames(color_palette, unique_types))
 
 # Create PCA plot
 plot_norm <- ggplot(pca_data_norm, aes(x = PC1, y = PC2, color = sample_types_norm, label = Sample)) +
-  geom_point(size = 5) +
+  geom_point(size = 3) +
   geom_text(hjust = 1.5, vjust = 1.5, size = 8, check_overlap = TRUE, show.legend = FALSE) +
   xlab(paste("PC1 - ", round(batch_pca_norm$sdev[1]^2 / sum(batch_pca_norm$sdev^2) * 100, 2), "% Variance")) +
   ylab(paste("PC2 - ", round(batch_pca_norm$sdev[2]^2 / sum(batch_pca_norm$sdev^2) * 100, 2), "% Variance")) +
@@ -3361,9 +3356,9 @@ plot_norm <- ggplot(pca_data_norm, aes(x = PC1, y = PC2, color = sample_types_no
     legend.position = "right",
     legend.title = element_text(size = 10, face = 'bold'),
     legend.text = element_text(size = 10),
-    axis.text = element_text(size = 25, face = 'bold'), 
-    axis.title = element_text(size = 25, face = 'bold'),
-    plot.title = element_text(size = 40, hjust = 0.5, face = 'bold')
+    axis.text = element_text(size = 15, face = 'bold'), 
+    axis.title = element_text(size = 15, face = 'bold'),
+    plot.title = element_text(size = 20, hjust = 0.5, face = 'bold')
   )
 
 print(plot_norm)
@@ -3387,7 +3382,7 @@ print(combined_pca_plots)
 ## 5. QCS PCA Plot {#corr_qcs_pca_2}
 :::
 
-::: {.cell .r}
+::: {#corr_pca_plot5 .cell .r}
 ```{r}
 ## QCS PCA Plot ##
 # combat #
@@ -3437,15 +3432,15 @@ average_distance_ec_combat <- mean(distances_from_centroid)
 
 # Plot PCA plot with QCS samples and their centroid
 pca_plot_qcs_combat <- ggplot(qcs_data_combat, aes(x = PC1, y = PC2, color = Batch)) +
-  geom_point(size = 7) +  # Plot QCS samples with color based on batch number
-  geom_point(data = data.frame(PC1 = qcs_centroid[1], PC2 = qcs_centroid[2]), aes(x = PC1, y = PC2), shape = 17, fill = "black", color = "black", size = 5) +  # Plot centroid as triangle with filled black color
+  geom_point(size = 3) +  # Plot QCS samples with color based on batch number
+  geom_point(data = data.frame(PC1 = qcs_centroid[1], PC2 = qcs_centroid[2]), aes(x = PC1, y = PC2), shape = 17, fill = "black", color = "black", size = 3) +  # Plot centroid as triangle with filled black color
   labs(x = paste("PC1 (", pc1_variance, "% Variance)"), y = paste("PC2 (", pc2_variance, "% Variance)"), title = "Combat (QCS)") +
   theme_bw() +
-  theme(axis.title.x = element_text(face = "bold", size = 15),
-        axis.title.y = element_text(face = "bold", size = 15),
+  theme(axis.title.x = element_text(face = "bold", size = 10),
+        axis.title.y = element_text(face = "bold", size = 10),
         axis.text = element_text(size = 15, face = "bold"),
         plot.margin = margin(20, 50, 10, 50),  
-        plot.title = element_text(face = "bold", size = 20))
+        plot.title = element_text(face = "bold", size = 15))
 
 # Creating data frame for average euclidean distance
 average_distance_qcs_df_combat <- data.frame(
@@ -3454,7 +3449,7 @@ average_distance_qcs_df_combat <- data.frame(
     )
 
 # Create a table plot
-table_plot_qcs_combat <- tableGrob(average_distance_qcs_df_combat, theme = ttheme_minimal(base_size = 20), rows = NULL)
+table_plot_qcs_combat <- tableGrob(average_distance_qcs_df_combat, theme = ttheme_minimal(base_size = 10), rows = NULL)
 
 # Combine the PCA plot and the table
 combined_plot_combat_qcs <- plot_grid(pca_plot_qcs_combat, table_plot_qcs_combat, ncol = 1, align = "v", axis = "lr", rel_heights = c(3, 1))
@@ -3514,15 +3509,15 @@ average_distance_ec_wave <- mean(distances_from_centroid)
 
 # Plot PCA plot with QCS samples and their centroid
 pca_plot_qcs_wave <- ggplot(qcs_data_wave, aes(x = PC1, y = PC2, color = Batch)) +
-  geom_point(size = 7) +  # Plot QCS samples with color based on batch number
-  geom_point(data = data.frame(PC1 = qcs_centroid[1], PC2 = qcs_centroid[2]), aes(x = PC1, y = PC2), shape = 17, fill = "black", color = "black", size = 5) +  # Plot centroid as triangle with filled black color
+  geom_point(size = 3) +  # Plot QCS samples with color based on batch number
+  geom_point(data = data.frame(PC1 = qcs_centroid[1], PC2 = qcs_centroid[2]), aes(x = PC1, y = PC2), shape = 17, fill = "black", color = "black", size = 3) +  # Plot centroid as triangle with filled black color
   labs(x = paste("PC1 (", pc1_variance, "% Variance)"), y = paste("PC2 (", pc2_variance, "% Variance)"), title = "WaveICA (QCS)") +
   theme_bw() +
-  theme(axis.title.x = element_text(face = "bold", size = 15),
-        axis.title.y = element_text(face = "bold", size = 15),
+  theme(axis.title.x = element_text(face = "bold", size = 10),
+        axis.title.y = element_text(face = "bold", size = 10),
         axis.text = element_text(size = 15, face = "bold"),
         plot.margin = margin(20, 50, 10, 50),  
-        plot.title = element_text(face = "bold", size = 20))
+        plot.title = element_text(face = "bold", size = 15))
 
 # Creating data frame for average euclidean distance
 average_distance_qcs_df_wave <- data.frame(
@@ -3531,7 +3526,7 @@ average_distance_qcs_df_wave <- data.frame(
     )
 
 # Create a table plot
-table_plot_qcs_wave <- tableGrob(average_distance_qcs_df_wave, theme = ttheme_minimal(base_size = 20), rows = NULL)
+table_plot_qcs_wave <- tableGrob(average_distance_qcs_df_wave, theme = ttheme_minimal(base_size = 10), rows = NULL)
 
 # Combine the PCA plot and the table
 combined_plot_wave_qcs <- plot_grid(pca_plot_qcs_wave, table_plot_qcs_wave, ncol = 1, align = "v", axis = "lr", rel_heights = c(3, 1))
@@ -3541,7 +3536,7 @@ print(combined_plot_wave_qcs)
 ```
 :::
 
-::: {.cell .r}
+::: {#corr_pca_plot5 .cell .r}
 ```{r}
 ## QCS PCA Plot ##
 # normae #
@@ -3567,7 +3562,7 @@ qcs_scores <- pca_scores[qcs_samples, 1:2] # obtaining only PC1 and PC2
 qcs_centroid <- colMeans(qcs_scores)
 
 # Add batch info
-qcs_batch_info <- batch_info_normae[qcs_samples, "batch"]
+qcs_batch_info <- batch_info_normae[qcs_samples, "batch"] + 1 #since norm batch starts from 0
 
 qcs_data_norm <- data.frame(
   PC1 = qcs_scores[, 1],
@@ -3591,15 +3586,15 @@ average_distance_ec_norm <- mean(distances_from_centroid)
 
 # Plot PCA plot with QCS samples and their centroid
 pca_plot_qcs_norm <- ggplot(qcs_data_norm, aes(x = PC1, y = PC2, color = Batch)) +
-  geom_point(size = 7) +  # Plot QCS samples with color based on batch number
-  geom_point(data = data.frame(PC1 = qcs_centroid[1], PC2 = qcs_centroid[2]), aes(x = PC1, y = PC2), shape = 17, fill = "black", color = "black", size = 5) +  # Plot centroid as triangle with filled black color
+  geom_point(size = 3) +  # Plot QCS samples with color based on batch number
+  geom_point(data = data.frame(PC1 = qcs_centroid[1], PC2 = qcs_centroid[2]), aes(x = PC1, y = PC2), shape = 17, fill = "black", color = "black", size = 3) +  # Plot centroid as triangle with filled black color
   labs(x = paste("PC1 (", pc1_variance, "% Variance)"), y = paste("PC2 (", pc2_variance, "% Variance)"), title = "NormAE (QCS)") +
   theme_bw() +
-  theme(axis.title.x = element_text(face = "bold", size = 15),
-        axis.title.y = element_text(face = "bold", size = 15),
+  theme(axis.title.x = element_text(face = "bold", size = 10),
+        axis.title.y = element_text(face = "bold", size = 10),
         axis.text = element_text(size = 15, face = "bold"),
         plot.margin = margin(20, 50, 10, 50),  
-        plot.title = element_text(face = "bold", size = 20))
+        plot.title = element_text(face = "bold", size = 15))
 
 # Creating data frame for average Euclidean distance
 average_distance_qcs_df_norm <- data.frame(
@@ -3608,7 +3603,7 @@ average_distance_qcs_df_norm <- data.frame(
     )
 
 # Create a table plot
-table_plot_qcs_norm <- tableGrob(average_distance_qcs_df_norm, theme = ttheme_minimal(base_size = 20), rows = NULL)
+table_plot_qcs_norm <- tableGrob(average_distance_qcs_df_norm, theme = ttheme_minimal(base_size = 10), rows = NULL)
 
 # Combine the PCA plot and the table
 combined_plot_norm_qcs <- plot_grid(pca_plot_qcs_norm, table_plot_qcs_norm, ncol = 1, align = "v", axis = "lr", rel_heights = c(3, 1))
@@ -3619,7 +3614,7 @@ print(combined_plot_norm_qcs)
 :::
 
 ::: {.cell .r}
-```{r fig.height=12, fig.width=7, echo=FALSE}
+```{r fig.height=20, fig.width=7, echo=FALSE}
 ## Overview PCA PLOT ##
 library(gridExtra)
 combined_qcs_pca_plots <- grid.arrange(combined_plot_qcs,
@@ -3628,7 +3623,7 @@ combined_qcs_pca_plots <- grid.arrange(combined_plot_qcs,
                                        combined_plot_wave_qcs,
                                        combined_plot_norm_qcs,
                                        ncol = 1,
-                                       heights = c(1,1,1,1))
+                                       heights = c(1,1,1,1,1))
 print(combined_qcs_pca_plots)
 ```
 :::
@@ -3637,7 +3632,7 @@ print(combined_qcs_pca_plots)
 ## 6. Tissue RSD {#corr_tissue_rsd_2}
 :::
 
-::: {.cell .r}
+::: {corr_tissue_rsd .cell .r}
 ```{r}
 ## run these functions first ##
 # 1: Function to calculate rsd for tissue
@@ -3814,7 +3809,6 @@ display_html(centered_html_content_combat)
 
 # load libraries
 library(kableExtra)
-library(IRdisplay)
 
 # WaveICA #
 data <- as.data.frame(t(waveica_result_interday)) 
@@ -3866,7 +3860,6 @@ display_html(centered_html_content_wave)
 
 # load libraries
 library(kableExtra)
-library(IRdisplay)
 
 # NormAE #
 data <- normae_result_interday
@@ -3952,8 +3945,8 @@ tissue_avg_distances_combat <- tissue_pca_data_with_centroids %>%
 
 # Create intragroup PCA plot with distance lines for visual validation
 tissue_intra_plot_combat <- ggplot(tissue_pca_data_with_centroids, aes(x = PC1, y = PC2, color = Type)) +
-  geom_point(size = 5) +
-  geom_point(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, color = Type), shape = 18, size = 5) +
+  geom_point(size = 3) +
+  geom_point(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, color = Type), shape = 18, size = 3) +
   geom_segment(aes(x = PC1, y = PC2, xend = Centroid_PC1, yend = Centroid_PC2), linetype = "dashed") +
   geom_text_repel(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, label = Type), 
                   direction = "both", size = 3) +
@@ -3962,13 +3955,13 @@ tissue_intra_plot_combat <- ggplot(tissue_pca_data_with_centroids, aes(x = PC1, 
        x = paste("PC1 - ", round(batch_pca_combat$sdev[1]^2 / sum(batch_pca_combat$sdev^2) * 100, 2), "% Variance"),
        y = paste("PC2 - ", round(batch_pca_combat$sdev[2]^2 / sum(batch_pca_combat$sdev^2) * 100, 2), "% Variance")) +
   theme_bw() +
-  theme(axis.text = element_text(size = 20, face = 'bold'), 
-        axis.title = element_text(size = 20, face = 'bold'),
-        plot.title = element_text(size = 25, hjust = 0.5, face = 'bold'),
+  theme(axis.text = element_text(size = 10, face = 'bold'), 
+        axis.title = element_text(size = 10, face = 'bold'),
+        plot.title = element_text(size = 15, hjust = 0.5, face = 'bold'),
         legend.position = "right")
 
 # Create table plot
-table_plot_combat <- tableGrob(tissue_avg_distances_combat, rows = NULL)
+table_plot_combat <- tableGrob(tissue_avg_distances_combat, theme = ttheme_default(base_size = 8))
 
 # Arrange PCA plot and table plot
 combined_plot_combat_intra <- grid.arrange(tissue_intra_plot_combat, table_plot_combat, ncol = 1, heights = c(3, 1))
@@ -4009,8 +4002,8 @@ tissue_avg_distances_wave <- tissue_pca_data_with_centroids %>%
 
 # Create intragroup PCA plot
 tissue_intra_plot_wave <- ggplot(tissue_pca_data_with_centroids, aes(x = PC1, y = PC2, color = Type)) +
-  geom_point(size = 5) +
-  geom_point(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, color = Type), shape = 18, size = 5) +
+  geom_point(size = 3) +
+  geom_point(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, color = Type), shape = 18, size = 3) +
   geom_segment(aes(x = PC1, y = PC2, xend = Centroid_PC1, yend = Centroid_PC2), linetype = "dashed") +  # Add dashed lines
   geom_text_repel(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, label = Type), 
                   direction = "both", size = 3) +
@@ -4019,13 +4012,13 @@ tissue_intra_plot_wave <- ggplot(tissue_pca_data_with_centroids, aes(x = PC1, y 
        x = paste("PC1 - ", round(batch_pca_wave$sdev[1]^2 / sum(batch_pca_wave$sdev^2) * 100, 2), "% Variance"),
        y = paste("PC2 - ", round(batch_pca_wave$sdev[2]^2 / sum(batch_pca_wave$sdev^2) * 100, 2), "% Variance")) +
   theme_bw() +
-  theme(axis.text = element_text(size = 20, face = 'bold'), 
-        axis.title = element_text(size = 20, face = 'bold'),
-        plot.title = element_text(size = 25, hjust = 0.5, face = 'bold'),
+  theme(axis.text = element_text(size = 10, face = 'bold'), 
+        axis.title = element_text(size = 10, face = 'bold'),
+        plot.title = element_text(size = 15, hjust = 0.5, face = 'bold'),
         legend.position = "right")
 
 # Create table plot
-table_plot_wave <- tableGrob(tissue_avg_distances_wave, rows = NULL)
+table_plot_wave <- tableGrob(tissue_avg_distances_wave, theme = ttheme_default(base_size = 8))
 
 # Arrange PCA plot and table plot
 combined_plot_wave_intra <- grid.arrange(tissue_intra_plot_wave, table_plot_wave, ncol = 1, heights = c(3, 1))
@@ -4066,8 +4059,8 @@ tissue_avg_distances_norm <- tissue_pca_data_with_centroids %>%
 
 # Create intragroup pca plot
 tissue_intra_plot_norm <- ggplot(tissue_pca_data_with_centroids, aes(x = PC1, y = PC2, color = Type)) +
-  geom_point(size = 5) +
-  geom_point(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, color = Type), shape = 18, size = 5) +
+  geom_point(size = 3) +
+  geom_point(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, color = Type), shape = 18, size = 3) +
   geom_segment(aes(x = PC1, y = PC2, xend = Centroid_PC1, yend = Centroid_PC2), linetype = "dashed") +  # Add dashed lines
   geom_text_repel(data = centroids, aes(x = Centroid_PC1, y = Centroid_PC2, label = Type), 
                   direction = "both", size = 3) +
@@ -4076,14 +4069,14 @@ tissue_intra_plot_norm <- ggplot(tissue_pca_data_with_centroids, aes(x = PC1, y 
        x = paste("PC1 - ", round(batch_pca_norm$sdev[1]^2 / sum(batch_pca_norm$sdev^2) * 100, 2), "% Variance"),
        y = paste("PC2 - ", round(batch_pca_norm$sdev[2]^2 / sum(batch_pca_norm$sdev^2) * 100, 2), "% Variance")) +
   theme_bw() +
-  theme(axis.text = element_text(size = 20, face = 'bold'), 
-        axis.title = element_text(size = 20, face = 'bold'),
-        plot.title = element_text(size = 25, hjust = 0.5, face = 'bold'),
+  theme(axis.text = element_text(size = 10, face = 'bold'), 
+        axis.title = element_text(size = 10, face = 'bold'),
+        plot.title = element_text(size = 15, hjust = 0.5, face = 'bold'),
         legend.position = "right")
 
 
 # Create table plot
-table_plot_norm <- tableGrob(tissue_avg_distances_norm, rows = NULL)
+table_plot_norm <- tableGrob(tissue_avg_distances_norm, theme = ttheme_default(base_size = 8))
 
 # Arrange PCA plot and table plot
 combined_plot_norm_intra <- grid.arrange(tissue_intra_plot_norm, table_plot_norm, ncol = 1, heights = c(3, 1))
@@ -4102,7 +4095,7 @@ tissue_plots <- grid.arrange(combined_plot_intra,
                              combined_plot_wave_intra,
                              combined_plot_norm_intra,
                              nrow = 1,
-                             heights = c(1,1,1,1))
+                             heights = c(1,1,1,1,1))
 print(tissue_plots)
 ```
 :::
