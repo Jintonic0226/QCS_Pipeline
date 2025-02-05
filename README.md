@@ -41,6 +41,18 @@ or Anaconda, depending on your preferred tool.
 Additionally, the pipeline is also available as R Markdown files for those who prefer working in
 an R-based environment.
 
+### Colab Setup
+1. Open Google Colab and go to 'File' then 'Open notebook'
+2. Select GitHub and copy the link of this repository for the GitHub URL: 'https://github.com/Jintonic0226/QCS_Pipeline'
+3. Select the pipeline you wish to run and run the code.
+
+### Anaconda Setup
+Have anaconda installed and import the environment found in the github using the following command in the conda terminal:
+
+    conda env create --name YOUR_ENVIRONMENT_NAME --file=PATH_TO_FILE/environment.yml
+    
+Use this environemnt when running the code.
+
 <h2>How to use</h2>
 <h3>Input data preparation</h3>
 <p><b>metabolomics_data</b> (no normalization / TIC normalization dataset obtained from SCiLS Lab)</p>
