@@ -21,7 +21,23 @@ Pipeline 1            |  Pipeline 2
 
 --- 
 
-<h3>Paper: **Luo's paper name** </h3>
+### Paper: [**Quality Control Standards for Batch Effect Evaluation and Correction in Mass Spectrometry Imaging**](https://doi.org/10.1021/acs.analchem.5c02020)
+
+If you are using this, please kindly cite:
+
+> Huang, L., Kim, Y., Balluff, B., & Cillero-Pastor, B. (2025). *Quality Control Standards for Batch Effect Evaluation and Correction in Mass Spectrometry Imaging.**Analytical Chemistry*, 10.1021/acs.analchem.5c02020. Advance online publication.  
+> https://doi.org/10.1021/acs.analchem.5c02020
+
+Or
+```
+@article{huang2025quality,
+  title={Quality Control Standards for Batch Effect Evaluation and Correction in Mass Spectrometry Imaging},
+  author={Huang, Luojiao and Kim, Yaejin and Balluff, Benjamin and Cillero-Pastor, Berta},
+  journal={Analytical Chemistry},
+  year={2025},
+  publisher={ACS Publications}
+}
+```
 
 --- 
 <h2>Table of Contents</h2> 
